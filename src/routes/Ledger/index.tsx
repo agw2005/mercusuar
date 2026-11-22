@@ -314,6 +314,7 @@ const Ledger = () => {
                                 type="number"
                                 name="investment_ask"
                                 id="investment_ask_element"
+                                step="any"
                             />
                         </label>
                     </GenericForm>
