@@ -40,11 +40,17 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         case "target":
             {
-                const name = String(formData.get("contact_name") ?? "").trim();
+                const weight = Number(formData.get("target_weight"));
+                const bodyFat = Number(formData.get("target_body_fat"));
+
+                const date = new Date().toISOString();
+
                 console.log({
                     form: formType,
                     data: {
-                        name,
+                        weight,
+                        bodyFat,
+                        date,
                     },
                 });
             }

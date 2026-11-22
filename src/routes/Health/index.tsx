@@ -48,12 +48,41 @@ const Health = () => {
                             />
                         </label>
                         <label htmlFor="sleep_end_element">
-                            <span title="Day before">Wake</span>
+                            <span title="Today">Wake</span>
                             <input
                                 required
                                 type="datetime-local"
                                 name="sleep_end"
                                 id="sleep_end_element"
+                            />
+                        </label>
+                    </GenericForm>
+                </section>
+                <section>
+                    <h2>Targets</h2>
+                    <GenericForm
+                        options={{ formName: `target`, onSubmit: handleSubmit }}
+                    >
+                        <label htmlFor="target_weight_element">
+                            Weight
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                name="target_weight"
+                                id="target_weight_element"
+                            />
+                        </label>
+                        <label htmlFor="target_body_fat_element">
+                            Body Fat (%)
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                name="target_body_fat"
+                                id="target_body_fat_element"
                             />
                         </label>
                     </GenericForm>
