@@ -1,5 +1,7 @@
 export const placeholder = {
     categories: [
+        "Transfer",
+        "Investment",
         "Allowance",
         "Cashback",
         "Interest Earned",
@@ -13,9 +15,10 @@ export const placeholder = {
         "Overhead",
         "Interest Paid",
         "Charity",
-        "Investment",
     ],
     accounts: [
+        "Receivable",
+        "Debt",
         "Coin",
         "Paper",
         "Main pocket",
@@ -23,8 +26,6 @@ export const placeholder = {
         "GoPay",
         "BNI",
         "Investment",
-        "Receivable",
-        "Debt",
     ],
     contacts: ["Person A", "Person B", "Person C", "Person D", "Person E"],
     fund_types: [

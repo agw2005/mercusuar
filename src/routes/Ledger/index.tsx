@@ -9,6 +9,7 @@ import {
     updateEntry,
 } from "#view/Ledger/transactionAccountEntries.ts";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
+import { useMemo } from "preact/hooks";
 
 const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
@@ -16,6 +17,12 @@ const Ledger = () => {
         value: "",
         sign: false,
     }]);
+
+    const contactRequired = useMemo(() => {
+        return accountChanges.value.some((change) =>
+            change.accountId === 0 || change.accountId === 1
+        );
+    }, [accountChanges.value]);
 
     return (
         <>
@@ -257,6 +264,26 @@ const Ledger = () => {
                                 Add affected account
                             </button>
                         )}
+
+                        {contactRequired &&
+                            (
+                                <label htmlFor="transaction_contact_element">
+                                    Contact
+                                    <select
+                                        name="transaction_contact"
+                                        id="transaction_contact_element"
+                                    >
+                                        {placeholder.contacts.map((
+                                            contact,
+                                            i,
+                                        ) => (
+                                            <option key={i} value={i}>
+                                                {contact}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                            )}
 
                         <label htmlFor="transaction_description_element">
                             Description

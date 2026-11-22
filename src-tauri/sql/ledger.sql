@@ -84,7 +84,8 @@ INSERT OR IGNORE INTO Categories (id, name, archived, is_system) VALUES
 
 INSERT OR IGNORE INTO Accounts (id, name, archived, is_system) VALUES 
     (1, 'Receivable', 0, 1),
-    (2, 'Debt', 0, 1);
+    (2, 'Debt', 0, 1),
+    (3, 'Investment', 0, 1);
 
 CREATE TRIGGER IF NOT EXISTS trg_protect_system_category_update
 BEFORE UPDATE ON Categories
