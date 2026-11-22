@@ -172,6 +172,25 @@ const Health = () => {
                         </label>
                     </GenericForm>
                 </section>
+                <section>
+                    <h2>Exercises</h2>
+                    <GenericForm
+                        options={{
+                            formName: `exercise`,
+                            onSubmit: handleSubmit,
+                        }}
+                    >
+                        <label htmlFor="exercise_name_element">
+                            Name
+                            <input
+                                required
+                                type="text"
+                                name="exercise_name"
+                                id="exercise_name_element"
+                            />
+                        </label>
+                    </GenericForm>
+                </section>
             </main>
         </>
     );

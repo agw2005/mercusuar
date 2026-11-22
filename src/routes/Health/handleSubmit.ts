@@ -83,34 +83,14 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         case "exercise":
             {
-                const categoryId = Number(formData.get("transaction_category"));
-                const affectedAccounts = formData.getAll("transaction_account");
-                const values = formData.getAll("transaction_value");
-                const signs = formData.getAll("transaction_value_sign");
-                const description = String(
-                    formData.get("transaction_description"),
-                );
-                const rawDate = String(formData.get("transaction_date"));
-                const date = rawDate.trim() === ""
-                    ? new Date().toISOString()
-                    : new Date(rawDate).toISOString();
-
-                const changes = affectedAccounts.map((
-                    accountId,
-                    index,
-                ) => ({
-                    accountId: Number(accountId),
-                    value: Number(values[index]),
-                    sign: Boolean(Number(signs[index])),
-                }));
+                const name = String(formData.get("exercise_name"));
 
                 console.log({
                     form: formType,
                     data: {
-                        categoryId,
-                        changes,
-                        description,
-                        date,
+                        active: true,
+                        name,
+                        archive: false,
                     },
                 });
             }
