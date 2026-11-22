@@ -1,4 +1,5 @@
 import GenericForm from "#/components/GenericForm.tsx";
+import { placeholder } from "#/libs/placeholder.ts";
 import handleSubmit from "./handleSubmit";
 
 const Health = () => {
@@ -109,7 +110,6 @@ const Health = () => {
                             <input
                                 required
                                 type="number"
-                                step={0}
                                 min={0}
                                 name="progress_age"
                                 id="progress_age_element"
@@ -187,6 +187,98 @@ const Health = () => {
                                 type="text"
                                 name="exercise_name"
                                 id="exercise_name_element"
+                            />
+                        </label>
+                    </GenericForm>
+                </section>
+                <section>
+                    <h2>Entries</h2>
+                    <GenericForm
+                        options={{
+                            formName: `entry`,
+                            onSubmit: handleSubmit,
+                        }}
+                    >
+                        <label htmlFor="entry_date_element">
+                            Date
+                            <input
+                                required
+                                type="datetime-local"
+                                name="entry_date"
+                                id="entry_date_element"
+                            />
+                        </label>
+                        <label htmlFor="entry_exercise_element">
+                            Exercise
+                            <select
+                                name="entry_exercise"
+                                id="entry_exercise_element"
+                            >
+                                {placeholder.exercises.map((exercise, i) => (
+                                    <option key={i} value={i}>
+                                        {exercise}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <label htmlFor="entry_kilogram_element">
+                            Kilogram
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                defaultValue={0}
+                                name="entry_kilogram"
+                                id="entry_kilogram_element"
+                            />
+                        </label>
+                        <label htmlFor="entry_pound_element">
+                            Pound
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                defaultValue={0}
+                                name="entry_pound"
+                                id="entry_pound_element"
+                            />
+                        </label>
+                        <label htmlFor="entry_bar_element">
+                            Bar
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                defaultValue={0}
+                                name="entry_bar"
+                                id="entry_bar_element"
+                            />
+                        </label>
+                        <label htmlFor="entry_seconds_element">
+                            Seconds
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                defaultValue={0}
+                                name="entry_seconds"
+                                id="entry_seconds_element"
+                            />
+                        </label>
+                        <label htmlFor="entry_rpe_element">
+                            RPE
+                            <input
+                                required
+                                type="number"
+                                step={0.1}
+                                min={0.0}
+                                defaultValue={0}
+                                name="entry_rpe"
+                                id="entry_rpe_element"
                             />
                         </label>
                     </GenericForm>
