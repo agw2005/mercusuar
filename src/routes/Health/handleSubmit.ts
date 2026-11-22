@@ -23,11 +23,17 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         case "sleep":
             {
-                const name = String(formData.get("account_name") ?? "").trim();
+                const rawStart = String(formData.get("sleep_start"));
+                const rawEnd = String(formData.get("sleep_end"));
+
+                const start = new Date(rawStart).toISOString();
+                const end = new Date(rawEnd).toISOString();
+
                 console.log({
                     form: formType,
                     data: {
-                        name,
+                        start,
+                        end,
                     },
                 });
             }

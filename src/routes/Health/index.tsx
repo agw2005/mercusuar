@@ -33,6 +33,31 @@ const Health = () => {
                         </label>
                     </GenericForm>
                 </section>
+                <section>
+                    <h2>Sleeps</h2>
+                    <GenericForm
+                        options={{ formName: `sleep`, onSubmit: handleSubmit }}
+                    >
+                        <label htmlFor="sleep_start_element">
+                            <span title="Day before">Sleep</span>
+                            <input
+                                required
+                                type="datetime-local"
+                                name="sleep_start"
+                                id="sleep_start_element"
+                            />
+                        </label>
+                        <label htmlFor="sleep_end_element">
+                            <span title="Day before">Wake</span>
+                            <input
+                                required
+                                type="datetime-local"
+                                name="sleep_end"
+                                id="sleep_end_element"
+                            />
+                        </label>
+                    </GenericForm>
+                </section>
             </main>
         </>
     );
