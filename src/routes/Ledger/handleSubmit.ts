@@ -73,8 +73,8 @@ const handleSubmit = async (e: SubmitEvent) => {
                     index,
                 ) => ({
                     accountId: Number(accountId),
-                    value: Number(values[index]),
-                    sign: Boolean(Number(signs[index])),
+                    value: Number(values[index]) *
+                        (Boolean(Number(signs[index])) ? -1 : 1),
                 }));
 
                 const contact = rawContact === null ? null : Number(rawContact);
