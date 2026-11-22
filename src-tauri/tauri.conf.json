@@ -12,9 +12,10 @@
   "app": {
     "windows": [
       {
-        "title": "mercusuar",
+        "title": "Mercusuar",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "generalAutofillEnabled": false
       }
     ],
     "security": {

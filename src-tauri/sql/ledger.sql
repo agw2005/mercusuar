@@ -38,25 +38,25 @@ CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON Transactions(category
 CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON Transactions(account_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_date ON Transactions(date);
 
-CREATE TABLE IF NOT EXISTS Entitlements (
+CREATE TABLE IF NOT EXISTS Receivables (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     transaction_id INTEGER NOT NULL,
     contact_id INTEGER NOT NULL,
     FOREIGN KEY (transaction_id) REFERENCES Transactions(id) ON DELETE CASCADE,
     FOREIGN KEY (contact_id) REFERENCES Contacts(id)
 );
-CREATE INDEX IF NOT EXISTS idx_entitlements_transaction_id ON Entitlements(transaction_id);
-CREATE INDEX IF NOT EXISTS idx_entitlements_contact_id ON Entitlements(contact_id);
+CREATE INDEX IF NOT EXISTS idx_receivables_transaction_id ON Receivables(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_receivables_contact_id ON Receivables(contact_id);
 
-CREATE TABLE IF NOT EXISTS Obligations (
+CREATE TABLE IF NOT EXISTS Debts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     transaction_id INTEGER NOT NULL,
     contact_id INTEGER NOT NULL,
     FOREIGN KEY (transaction_id) REFERENCES Transactions(id) ON DELETE CASCADE,
     FOREIGN KEY (contact_id) REFERENCES Contacts(id)
 );
-CREATE INDEX IF NOT EXISTS idx_obligations_transaction_id ON Obligations(transaction_id);
-CREATE INDEX IF NOT EXISTS idx_obligations_contact_id ON Obligations(contact_id);
+CREATE INDEX IF NOT EXISTS idx_debts_transaction_id ON Debts(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_debts_contact_id ON Debts(contact_id);
 
 CREATE TABLE IF NOT EXISTS Investments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,8 +100,8 @@ END;
 CREATE TRIGGER IF NOT EXISTS trg_archive_or_delete_contact
 BEFORE DELETE ON Contacts
 FOR EACH ROW
-WHEN EXISTS (SELECT 1 FROM Entitlements WHERE contact_id = OLD.id)
-  OR EXISTS (SELECT 1 FROM Obligations WHERE contact_id = OLD.id)
+WHEN EXISTS (SELECT 1 FROM Receivables WHERE contact_id = OLD.id)
+  OR EXISTS (SELECT 1 FROM Debts WHERE contact_id = OLD.id)
 BEGIN
     UPDATE Contacts SET archived = 1 WHERE id = OLD.id;
     SELECT RAISE(IGNORE);

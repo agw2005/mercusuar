@@ -5,9 +5,10 @@ import {
   Route,
   Router,
 } from "preact-iso";
+// import "#/App.css";
 
 const Home = lazy(() => import("#view/index.tsx"));
-const About = lazy(() => import("#view/About/index.tsx"));
+const Ledger = lazy(() => import("#view/Ledger/index.tsx"));
 
 const App = () => {
   return (
@@ -15,7 +16,7 @@ const App = () => {
       <ErrorBoundary>
         <Router>
           <Route path="/" component={Home} />
-          <Route path="/about" component={About} />
+          <Route path="/ledger" component={Ledger} />
         </Router>
       </ErrorBoundary>
     </LocationProvider>
