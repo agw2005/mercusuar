@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Trackers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     habit_id INTEGER NOT NULL,
     date DATETIME NOT NULL,
-    quantity DECIMAL NOT NULL,
+    quantity DECIMAL,
     description TEXT,
     FOREIGN KEY (habit_id) REFERENCES Habits(id)
 );

@@ -1,9 +1,12 @@
 import GenericForm from "#/components/GenericForm.tsx";
 import { useSignal } from "@preact/signals";
+import { placeholder } from "#/libs/placeholder.ts";
 
 const Habit = () => {
     const newHabitPositive = useSignal(true);
     const newHabitStackable = useSignal(true);
+    const newTrackerHabitStackable = useSignal(false);
+
     return (
         <>
             <header>
@@ -79,6 +82,55 @@ const Habit = () => {
                                 step="any"
                                 name="habit_output"
                                 id="habit_output_element"
+                            />
+                        </label>
+                    </GenericForm>
+                </section>
+                <section>
+                    <h2>Trackers</h2>
+                    <GenericForm options={{ formName: "tracker" }}>
+                        <label htmlFor="tracker_habit_element">
+                            Habit
+                            <select
+                                name="tracker_habit"
+                                id="tracker_habit_element"
+                                onChange={(e) => {
+                                    const habitIndex = Number(
+                                        e.currentTarget.value,
+                                    );
+                                    newTrackerHabitStackable.value =
+                                        placeholder.habits[habitIndex]
+                                            .stackable;
+                                }}
+                            >
+                                {placeholder.habits.map((habit, i) => {
+                                    return (
+                                        <option key={i} value={i}>
+                                            {habit.stackable
+                                                ? `(${habit.quantity} ${habit.metric}) `
+                                                : ``}
+                                            {habit.name}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </label>
+                        {newTrackerHabitStackable.value && (
+                            <label htmlFor="tracker_quantity_element">
+                                Quantity
+                                <input
+                                    type="number"
+                                    step="any"
+                                    name="tracker_quantity"
+                                    id="tracker_quantity_element"
+                                />
+                            </label>
+                        )}
+                        <label htmlFor="tracker_description_element">
+                            Description
+                            <textarea
+                                name="tracker_description"
+                                id="tracker_description_element"
                             />
                         </label>
                     </GenericForm>
