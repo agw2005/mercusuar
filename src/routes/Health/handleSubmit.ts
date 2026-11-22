@@ -57,12 +57,26 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         case "progress":
             {
-                const name = String(formData.get("fund_type_name") ?? "")
-                    .trim();
+                const rawDate = String(formData.get("progress_date"));
+                const age = Number(formData.get("progress_age"));
+                const height = Number(formData.get("progress_height"));
+                const weight = Number(formData.get("progress_weight"));
+                const neck = Number(formData.get("progress_neck"));
+                const waist = Number(formData.get("progress_waist"));
+                const bodyFat = Number(formData.get("progress_body_fat"));
+
+                const date = new Date(rawDate).toISOString();
+
                 console.log({
                     form: formType,
                     data: {
-                        name,
+                        date,
+                        age,
+                        height,
+                        weight,
+                        neck,
+                        waist,
+                        bodyFat,
                     },
                 });
             }

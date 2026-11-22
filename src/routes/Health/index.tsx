@@ -18,7 +18,7 @@ const Health = () => {
                     >
                         <label htmlFor="weight_date_element">
                             <input
-                                type="datetime-local"
+                                type="date"
                                 name="weight_date"
                                 id="weight_date_element"
                             />
@@ -83,6 +83,91 @@ const Health = () => {
                                 min={0}
                                 name="target_body_fat"
                                 id="target_body_fat_element"
+                            />
+                        </label>
+                    </GenericForm>
+                </section>
+                <section>
+                    <h2>Progress</h2>
+                    <GenericForm
+                        options={{
+                            formName: `progress`,
+                            onSubmit: handleSubmit,
+                        }}
+                    >
+                        <label htmlFor="progress_date_element">
+                            Date
+                            <input
+                                required
+                                type="date"
+                                name="progress_date"
+                                id="progress_date_element"
+                            />
+                        </label>
+                        <label htmlFor="progress_age_element">
+                            Age
+                            <input
+                                required
+                                type="number"
+                                step={0}
+                                min={0}
+                                name="progress_age"
+                                id="progress_age_element"
+                            />
+                        </label>
+                        <label htmlFor="progress_height_element">
+                            Height
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                name="progress_height"
+                                id="progress_height_element"
+                            />
+                        </label>
+                        <label htmlFor="progress_weight_element">
+                            Weight
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                name="progress_weight"
+                                id="progress_weight_element"
+                            />
+                        </label>
+                        <label htmlFor="progress_neck_element">
+                            Neck
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                name="progress_neck"
+                                id="progress_neck_element"
+                            />
+                        </label>
+                        <label htmlFor="progress_waist_element">
+                            Waist
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                name="progress_waist"
+                                id="progress_waist_element"
+                            />
+                        </label>
+                        <label htmlFor="progress_body_fat_element">
+                            Body Fat (%)
+                            <input
+                                required
+                                type="number"
+                                step="any"
+                                min={0}
+                                name="progress_body_fat"
+                                id="progress_body_fat_element"
                             />
                         </label>
                     </GenericForm>
