@@ -1,6 +1,7 @@
 import GenericForm from "#/components/GenericForm.tsx";
 import { useSignal } from "@preact/signals";
 import { placeholder } from "#/libs/placeholder.ts";
+import handleSubmit from "#view/Habit/handleSubmit.ts";
 
 const Habit = () => {
     const newHabitPositive = useSignal(true);
@@ -17,7 +18,9 @@ const Habit = () => {
             <main>
                 <section>
                     <h2>Habits</h2>
-                    <GenericForm options={{ formName: "habit" }}>
+                    <GenericForm
+                        options={{ formName: "habit", onSubmit: handleSubmit }}
+                    >
                         <label htmlFor="habit_name_element">
                             Name
                             <input
@@ -30,6 +33,7 @@ const Habit = () => {
                             type="hidden"
                             name="habit_positive"
                             id="habit_positive_element"
+                            value={Number(newHabitPositive.value)}
                         />
                         <button
                             type="button"
@@ -46,6 +50,7 @@ const Habit = () => {
                             type="hidden"
                             name="habit_stackable"
                             id="habit_stackable_element"
+                            value={Number(newHabitStackable.value)}
                         />
                         <button
                             type="button"
@@ -88,7 +93,12 @@ const Habit = () => {
                 </section>
                 <section>
                     <h2>Trackers</h2>
-                    <GenericForm options={{ formName: "tracker" }}>
+                    <GenericForm
+                        options={{
+                            formName: "tracker",
+                            onSubmit: handleSubmit,
+                        }}
+                    >
                         <label htmlFor="tracker_habit_element">
                             Habit
                             <select

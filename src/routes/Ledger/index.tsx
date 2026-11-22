@@ -8,6 +8,7 @@ import {
     resetAccounts,
     updateEntry,
 } from "#view/Ledger/transactionAccountEntries.ts";
+import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
 const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
@@ -32,7 +33,10 @@ const Ledger = () => {
                         })}
                     </ul>
                     <GenericForm
-                        options={{ formName: "category" }}
+                        options={{
+                            formName: "category",
+                            onSubmit: handleSubmit,
+                        }}
                     >
                         <label htmlFor="category_name_element">
                             Name
@@ -52,7 +56,10 @@ const Ledger = () => {
                         })}
                     </ul>
                     <GenericForm
-                        options={{ formName: "account" }}
+                        options={{
+                            formName: "account",
+                            onSubmit: handleSubmit,
+                        }}
                     >
                         <label htmlFor="account_name_element">
                             Name
@@ -72,7 +79,10 @@ const Ledger = () => {
                         })}
                     </ul>
                     <GenericForm
-                        options={{ formName: "contact" }}
+                        options={{
+                            formName: "contact",
+                            onSubmit: handleSubmit,
+                        }}
                     >
                         <label htmlFor="contact_name_element">
                             Name
@@ -92,7 +102,10 @@ const Ledger = () => {
                         })}
                     </ul>
                     <GenericForm
-                        options={{ formName: "fund_type" }}
+                        options={{
+                            formName: "fund_type",
+                            onSubmit: handleSubmit,
+                        }}
                     >
                         <label htmlFor="fund_type_name_element">
                             Name
@@ -109,6 +122,7 @@ const Ledger = () => {
                     <GenericForm
                         options={{
                             formName: "transaction",
+                            onSubmit: handleSubmit,
                             onReset: () => resetAccounts(accountChanges),
                         }}
                     >
@@ -266,7 +280,10 @@ const Ledger = () => {
                 <section>
                     <h2>Investments</h2>
                     <GenericForm
-                        options={{ formName: "investment" }}
+                        options={{
+                            formName: "investment",
+                            onSubmit: handleSubmit,
+                        }}
                     >
                         <label htmlFor="investment_fund_type_element">
                             Fund Type

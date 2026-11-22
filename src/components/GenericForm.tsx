@@ -1,4 +1,3 @@
-import handleSubmit from "#view/Ledger/handleSubmit.ts";
 import { ComponentChildren, GenericEventHandler } from "preact";
 import { snakeToSpaces } from "#/libs/snakeToSpaces.ts";
 import { capitalizedCase } from "../libs/capitalizedCase";
@@ -8,18 +7,19 @@ interface GenericFormProps {
         formName: string;
         submitText?: string | null;
         onReset?: GenericEventHandler<HTMLFormElement>;
+        onSubmit: (e: SubmitEvent) => Promise<void>;
     };
     children: ComponentChildren;
 }
 
 const GenericForm = ({
-    options: { formName, submitText = null, onReset },
+    options: { formName, submitText = null, onReset, onSubmit },
     children,
 }: GenericFormProps) => {
     return (
         <form
             data-form-type={formName}
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
             onReset={onReset}
         >
             {children}
