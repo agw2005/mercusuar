@@ -1,3 +1,5 @@
+import { invoke } from "@tauri-apps/api/core";
+
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
@@ -125,6 +127,7 @@ const handleSubmit = async (e: SubmitEvent) => {
             console.error("No form of that name exists.");
     }
 
+    invoke("health_ping");
     form.reset();
 };
 
