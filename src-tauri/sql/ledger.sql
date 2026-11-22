@@ -3,13 +3,15 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS Categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    archived BOOLEAN NOT NULL DEFAULT 0
+    archived BOOLEAN NOT NULL DEFAULT 0,
+    is_system BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS Accounts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    archived BOOLEAN NOT NULL DEFAULT 0
+    archived BOOLEAN NOT NULL DEFAULT 0,
+    is_system BOOLEAN NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS Contacts (
@@ -71,6 +73,50 @@ CREATE TABLE IF NOT EXISTS Investments (
     FOREIGN KEY (fund_type_id) REFERENCES Fund_Types(id)
 );
 CREATE INDEX IF NOT EXISTS idx_investments_fund_type_id ON Investments(fund_type_id);
+
+/*
+Seed the database & protect initial value from deletion/modification
+*/
+
+INSERT OR IGNORE INTO Categories (id, name, archived, is_system) VALUES 
+    (1, 'Transfer', 0, 1),
+    (2, 'Investment', 0, 1);
+
+INSERT OR IGNORE INTO Accounts (id, name, archived, is_system) VALUES 
+    (1, 'Receivable', 0, 1),
+    (2, 'Debt', 0, 1);
+
+CREATE TRIGGER IF NOT EXISTS trg_protect_system_category_update
+BEFORE UPDATE ON Categories
+FOR EACH ROW
+WHEN OLD.is_system = 1
+BEGIN
+    SELECT RAISE(ABORT, 'Default categories cannot be modified');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_protect_system_category_delete
+BEFORE DELETE ON Categories
+FOR EACH ROW
+WHEN OLD.is_system = 1
+BEGIN
+    SELECT RAISE(ABORT, 'Default categories cannot be deleted');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_protect_system_account_update
+BEFORE UPDATE ON Accounts
+FOR EACH ROW
+WHEN OLD.is_system = 1
+BEGIN
+    SELECT RAISE(ABORT, 'Default accounts cannot be modified');
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_protect_system_account_delete
+BEFORE DELETE ON Accounts
+FOR EACH ROW
+WHEN OLD.is_system = 1
+BEGIN
+    SELECT RAISE(ABORT, 'Default accounts cannot be deleted');
+END;
 
 /*
 You can run `DELETE FROM ... WHERE id = ?` without a separate conditional logic to check for usage first.
