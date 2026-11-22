@@ -9,6 +9,7 @@ import {
 
 const Home = lazy(() => import("#view/index.tsx"));
 const Ledger = lazy(() => import("#view/Ledger/index.tsx"));
+const Habit = lazy(() => import("#view/Habit/index.tsx"));
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Router>
           <Route path="/" component={Home} />
           <Route path="/ledger" component={Ledger} />
+          <Route path="/habit" component={Habit} />
         </Router>
       </ErrorBoundary>
     </LocationProvider>

@@ -21,6 +21,7 @@ const Ledger = () => {
             <header>
                 <h1>Ledger</h1>
                 <a href="/">Home</a>
+                <a href="/habit">Habit</a>
             </header>
             <main>
                 <section>

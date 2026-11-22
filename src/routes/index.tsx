@@ -2,9 +2,8 @@ function Home() {
     return (
         <div>
             <h1>Home</h1>
-            <a href="/ledger" className={`text-blue-500 hover:text-red-500`}>
-                Ledger
-            </a>
+            <a href="/ledger">Ledger</a>
+            <a href="/habit">Habit</a>
         </div>
     );
 }
