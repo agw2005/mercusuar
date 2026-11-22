@@ -12,7 +12,7 @@ import {
 const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
         accountId: 0,
-        value: 0,
+        value: "",
         sign: false,
     }]);
 
@@ -200,6 +200,7 @@ const Ledger = () => {
                                     Value
                                     <input
                                         type="number"
+                                        step="any"
                                         name="transaction_value"
                                         id={`transaction_value_element_${rowIndex}`}
                                         value={entry.value}
@@ -208,9 +209,8 @@ const Ledger = () => {
                                                 accountChanges,
                                                 rowIndex,
                                                 {
-                                                    value: Number(
+                                                    value:
                                                         e.currentTarget.value,
-                                                    ),
                                                 },
                                             )}
                                     />

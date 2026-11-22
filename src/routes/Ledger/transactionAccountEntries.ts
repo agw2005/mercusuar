@@ -3,7 +3,7 @@ import { placeholder } from "#/libs/placeholder.ts";
 
 export interface AccountEntry {
     accountId: number;
-    value: number;
+    value: number | string;
     sign: boolean;
 }
 
@@ -15,7 +15,7 @@ export const addAccount = (entries: Signal<AccountEntry[]>) => {
     if (nextAvailable !== -1) {
         entries.value = [
             ...entries.value,
-            { accountId: nextAvailable, value: 0, sign: false },
+            { accountId: nextAvailable, value: "", sign: false },
         ];
     }
 };
@@ -40,5 +40,5 @@ export const updateEntry = (
 };
 
 export const resetAccounts = (entries: Signal<AccountEntry[]>) => {
-    entries.value = [{ accountId: 0, value: 0, sign: false }];
+    entries.value = [{ accountId: 0, value: "", sign: false }];
 };
