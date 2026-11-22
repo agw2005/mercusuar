@@ -23,6 +23,7 @@ const Ledger = () => {
                 <h1>Ledger</h1>
                 <a href="/">Home</a>
                 <a href="/habit">Habit</a>
+                <a href="/health">Health</a>
             </header>
             <main>
                 <section>

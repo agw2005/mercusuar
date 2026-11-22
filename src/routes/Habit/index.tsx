@@ -14,6 +14,7 @@ const Habit = () => {
                 <h1>Habit</h1>
                 <a href="/">Home</a>
                 <a href="/ledger">Ledger</a>
+                <a href="/health">Health</a>
             </header>
             <main>
                 <section>
