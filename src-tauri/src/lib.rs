@@ -33,6 +33,8 @@ pub fn run() {
             ledger::accounts::create_account,
             ledger::contacts::get_unarchived_contacts,
             ledger::contacts::create_contact,
+            ledger::fund_types::get_unarchived_fund_types,
+            ledger::fund_types::create_fund_type,
             habit::habit_ping,
             health::health_ping
         ])

@@ -22,6 +22,10 @@ import {
     refetchUnarchivedContacts,
     unarchivedContacts,
 } from "#/libs/store/contacts.ts";
+import {
+    refetchUnarchivedFundTypes,
+    unarchivedFundTypes,
+} from "#/libs/store/fundType.ts";
 
 const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
@@ -40,6 +44,7 @@ const Ledger = () => {
         refetchUnarchivedCategories();
         refetchUnarchivedAccounts();
         refetchUnarchivedContacts();
+        refetchUnarchivedFundTypes();
     }, []);
 
     return (
@@ -123,8 +128,8 @@ const Ledger = () => {
                 <section>
                     <h2>Fund Types</h2>
                     <ul>
-                        {placeholder.fund_types.map((fund_type, i) => {
-                            return <li key={i}>{fund_type}</li>;
+                        {unarchivedFundTypes.value.map((fund_type) => {
+                            return <li key={fund_type.id}>{fund_type.name}</li>;
                         })}
                     </ul>
                     <GenericForm
