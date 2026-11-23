@@ -8,7 +8,7 @@ export const refetchUnarchivedAccounts = async () => {
     try {
         unarchivedAccounts.value = await accountsQuery.get.all_unarchived;
     } catch (error) {
-        console.error("Failed to fetch unarchived categories:", error);
+        console.error("Failed to fetch unarchived accounts:", error);
     }
 };
 

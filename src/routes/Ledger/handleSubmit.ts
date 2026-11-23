@@ -11,6 +11,10 @@ import {
     contactsQuery,
     refetchUnarchivedContacts,
 } from "#/libs/store/contacts.ts";
+import {
+    fundTypesQuery,
+    refetchUnarchivedFundTypes,
+} from "#/libs/store/fundType.ts";
 
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -42,14 +46,9 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         case "fund_type":
             {
-                const name = String(formData.get("fund_type_name") ?? "")
-                    .trim();
-                console.log({
-                    form: formType,
-                    data: {
-                        name,
-                    },
-                });
+                const name = String(formData.get("fund_type_name")).trim();
+                await fundTypesQuery.post(name);
+                await refetchUnarchivedFundTypes();
             }
             break;
         case "transaction":
