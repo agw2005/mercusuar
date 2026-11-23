@@ -11,3 +11,36 @@ export interface Accounts {
     archived: boolean;
     is_system: boolean;
 }
+
+export interface Contacts {
+    id: number;
+    name: string;
+    archived: boolean;
+}
+
+export interface FundTypes {
+    id: number;
+    name: string;
+    archived: boolean;
+}
+
+export interface Transactions {
+    id: number;
+    category_id: number;
+    account_id: number;
+    value: number;
+    description: string;
+    date: string;
+}
+
+export interface Receivables {
+    id: number;
+    transaction_id: number;
+    contact_id: number;
+}
+
+export interface Debts {
+    id: number;
+    transaction_id: number;
+    contact_id: number;
+}
