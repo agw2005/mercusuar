@@ -31,6 +31,8 @@ pub fn run() {
             ledger::categories::create_category,
             ledger::accounts::get_unarchived_accounts,
             ledger::accounts::create_account,
+            ledger::contacts::get_unarchived_contacts,
+            ledger::contacts::create_contact,
             habit::habit_ping,
             health::health_ping
         ])

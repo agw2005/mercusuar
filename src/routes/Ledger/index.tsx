@@ -18,6 +18,10 @@ import {
     refetchUnarchivedAccounts,
     unarchivedAccounts,
 } from "#/libs/store/accounts.ts";
+import {
+    refetchUnarchivedContacts,
+    unarchivedContacts,
+} from "#/libs/store/contacts.ts";
 
 const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
@@ -35,6 +39,7 @@ const Ledger = () => {
     useEffect(() => {
         refetchUnarchivedCategories();
         refetchUnarchivedAccounts();
+        refetchUnarchivedContacts();
     }, []);
 
     return (
@@ -95,8 +100,8 @@ const Ledger = () => {
                 <section>
                     <h2>Contacts</h2>
                     <ul>
-                        {placeholder.contacts.map((contact, i) => {
-                            return <li key={i}>{contact}</li>;
+                        {unarchivedContacts.value.map((contact) => {
+                            return <li key={contact.id}>{contact.name}</li>;
                         })}
                     </ul>
                     <GenericForm
