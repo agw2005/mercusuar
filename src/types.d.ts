@@ -1,3 +1,5 @@
+// Ledger
+
 export interface Categories {
     id: number;
     name: string;
@@ -43,4 +45,11 @@ export interface Debts {
     id: number;
     transaction_id: number;
     contact_id: number;
+}
+
+// Custom types
+
+export interface AccountChange {
+    accountId: number;
+    value: number;
 }

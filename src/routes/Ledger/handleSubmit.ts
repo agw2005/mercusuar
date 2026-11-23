@@ -15,6 +15,7 @@ import {
     fundTypesQuery,
     refetchUnarchivedFundTypes,
 } from "#/libs/store/fundType.ts";
+import type { AccountChange } from "#/types.d.ts";
 
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -53,7 +54,7 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         case "transaction":
             {
-                const categoryId = Number(formData.get("transaction_category"));
+                const category = Number(formData.get("transaction_category"));
                 const affectedAccounts = formData.getAll("transaction_account");
                 const values = formData.getAll("transaction_value");
                 const signs = formData.getAll("transaction_value_sign");
@@ -67,7 +68,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                     ? new Date().toISOString()
                     : new Date(rawDate).toISOString();
 
-                const changes = affectedAccounts.map((
+                const changes: AccountChange[] = affectedAccounts.map((
                     accountId,
                     index,
                 ) => ({
@@ -81,7 +82,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                 console.log({
                     form: formType,
                     data: {
-                        categoryId,
+                        category,
                         changes,
                         contact,
                         description,
