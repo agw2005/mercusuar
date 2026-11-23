@@ -10,7 +10,10 @@ import {
 } from "#view/Ledger/transactionAccountEntries.ts";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
 import { useEffect } from "preact/hooks";
-import { categories, refreshCategories } from "#/libs/store/categories.ts";
+import {
+    getUnarchivedCategories,
+    unarchivedCategories,
+} from "#/libs/store/categories.ts";
 
 const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
@@ -26,7 +29,7 @@ const Ledger = () => {
     });
 
     useEffect(() => {
-        refreshCategories();
+        getUnarchivedCategories();
     }, []);
 
     return (
@@ -41,7 +44,7 @@ const Ledger = () => {
                 <section>
                     <h2>Categories</h2>
                     <ul>
-                        {categories.value.map((category) => {
+                        {unarchivedCategories.value.map((category) => {
                             return <li key={category.id}>{category.name}</li>;
                         })}
                     </ul>
