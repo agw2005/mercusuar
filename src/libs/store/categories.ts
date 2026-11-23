@@ -4,7 +4,7 @@ import type { Categories } from "#/types.d.ts";
 
 export const unarchivedCategories = signal<Categories[]>([]);
 
-export const getUnarchivedCategories = async () => {
+export const refetchUnarchivedCategories = async () => {
     try {
         unarchivedCategories.value = await categoriesQuery.get.all_unarchived;
     } catch (error) {

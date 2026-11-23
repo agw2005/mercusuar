@@ -1,9 +1,16 @@
 import { invoke } from "@tauri-apps/api/core";
 import {
     categoriesQuery,
-    getUnarchivedCategories,
+    refetchUnarchivedCategories,
 } from "#/libs/store/categories.ts";
-import { accountsQuery, getUnarchivedAccounts } from "#/libs/store/accounts.ts";
+import {
+    accountsQuery,
+    refetchUnarchivedAccounts,
+} from "#/libs/store/accounts.ts";
+import {
+    contactsQuery,
+    refetchUnarchivedContacts,
+} from "#/libs/store/contacts.ts";
 
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -14,27 +21,23 @@ const handleSubmit = async (e: SubmitEvent) => {
     switch (formType) {
         case "category":
             {
-                const name = String(formData.get("category_name"));
+                const name = String(formData.get("category_name")).trim();
                 await categoriesQuery.post(name);
-                await getUnarchivedCategories();
+                await refetchUnarchivedCategories();
             }
             break;
         case "account":
             {
-                const name = String(formData.get("account_name"));
+                const name = String(formData.get("account_name")).trim();
                 await accountsQuery.post(name);
-                await getUnarchivedAccounts();
+                await refetchUnarchivedAccounts();
             }
             break;
         case "contact":
             {
-                const name = String(formData.get("contact_name") ?? "").trim();
-                console.log({
-                    form: formType,
-                    data: {
-                        name,
-                    },
-                });
+                const name = String(formData.get("contact_name")).trim();
+                await contactsQuery.post(name);
+                await refetchUnarchivedContacts();
             }
             break;
         case "fund_type":

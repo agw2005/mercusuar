@@ -11,7 +11,7 @@ import {
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
 import { useEffect } from "preact/hooks";
 import {
-    getUnarchivedCategories,
+    refetchUnarchivedCategories,
     unarchivedCategories,
 } from "#/libs/store/categories.ts";
 
@@ -29,7 +29,7 @@ const Ledger = () => {
     });
 
     useEffect(() => {
-        getUnarchivedCategories();
+        refetchUnarchivedCategories();
     }, []);
 
     return (

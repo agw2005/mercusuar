@@ -4,7 +4,7 @@ import type { Accounts } from "#/types.d.ts";
 
 export const unarchivedAccounts = signal<Accounts[]>([]);
 
-export const getUnarchivedAccounts = async () => {
+export const refetchUnarchivedAccounts = async () => {
     try {
         unarchivedAccounts.value = await accountsQuery.get.all_unarchived;
     } catch (error) {
