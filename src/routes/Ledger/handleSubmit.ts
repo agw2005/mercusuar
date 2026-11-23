@@ -15,6 +15,10 @@ import {
     refetchUnarchivedFundTypes,
 } from "#/libs/store/fundType.ts";
 import type { AccountChange } from "#/types.d.ts";
+import {
+    refetchTransactionsAtMonth,
+    transactionsQuery,
+} from "#/libs/store/transactions.ts";
 
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -62,6 +66,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                     formData.get("transaction_description"),
                 );
                 const rawDate = String(formData.get("transaction_date"));
+                const rawSelectedDate = String(formData.get("selected_date"));
 
                 const date = rawDate.trim() === ""
                     ? new Date().toISOString()
@@ -78,16 +83,18 @@ const handleSubmit = async (e: SubmitEvent) => {
 
                 const contact = rawContact === null ? null : Number(rawContact);
 
-                console.log({
-                    form: formType,
-                    data: {
-                        category,
-                        changes,
-                        contact,
-                        description,
-                        date,
-                    },
-                });
+                transactionsQuery.post(
+                    category,
+                    changes,
+                    contact,
+                    description,
+                    date,
+                );
+
+                const split = rawSelectedDate.split("-");
+                const year = Number(split[0])
+                const month = Number(split[1])
+                refetchTransactionsAtMonth(month, year);
             }
             break;
         case "investment":

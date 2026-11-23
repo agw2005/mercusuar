@@ -1,5 +1,5 @@
 import { Signal } from "@preact/signals";
-import { placeholder } from "#/libs/placeholder.ts";
+import { unarchivedAccounts } from "#/libs/store/accounts.ts";
 
 export interface AccountEntry {
     accountId: number;
@@ -9,13 +9,17 @@ export interface AccountEntry {
 
 export const addAccount = (entries: Signal<AccountEntry[]>) => {
     const usedIds = entries.value.map((entry) => entry.accountId);
-    const nextAvailable = placeholder.accounts.findIndex(
-        (_, idx) => !usedIds.includes(idx),
+    const nextAvailableAccount = unarchivedAccounts.value.find(
+        (account) => !usedIds.includes(account.id),
     );
-    if (nextAvailable !== -1) {
+    if (nextAvailableAccount) {
         entries.value = [
             ...entries.value,
-            { accountId: nextAvailable, value: "", sign: false },
+            {
+                accountId: nextAvailableAccount.id,
+                value: "",
+                sign: false,
+            },
         ];
     }
 };
@@ -40,5 +44,9 @@ export const updateEntry = (
 };
 
 export const resetAccounts = (entries: Signal<AccountEntry[]>) => {
-    entries.value = [{ accountId: 0, value: "", sign: false }];
+    entries.value = [{
+        accountId: 1,
+        value: "",
+        sign: false,
+    }];
 };

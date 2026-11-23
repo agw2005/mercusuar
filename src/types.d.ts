@@ -53,3 +53,10 @@ export interface AccountChange {
     accountId: number;
     value: number;
 }
+
+export interface TransactionByTime {
+    category: number;
+    changes: (AccountChange & { transactionId: number })[];
+    description: string;
+    date: string;
+}
