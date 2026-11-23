@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
 import {
     categoriesQuery,
     refetchUnarchivedCategories,
@@ -121,7 +120,6 @@ const handleSubmit = async (e: SubmitEvent) => {
             console.error("No form of that name exists.");
     }
 
-    invoke("ledger_ping");
     form.reset();
 };
 
