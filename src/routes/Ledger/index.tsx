@@ -1,4 +1,4 @@
-import { useSignal } from "@preact/signals";
+import { useComputed, useSignal } from "@preact/signals";
 import { placeholder } from "#/libs/placeholder.ts";
 import GenericForm from "#/components/GenericForm.tsx";
 import {
@@ -9,7 +9,8 @@ import {
     updateEntry,
 } from "#view/Ledger/transactionAccountEntries.ts";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
-import { useMemo } from "preact/hooks";
+import { useEffect } from "preact/hooks";
+import { categories, refreshCategories } from "#/libs/store/categories.ts";
 
 const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
@@ -18,11 +19,15 @@ const Ledger = () => {
         sign: false,
     }]);
 
-    const contactRequired = useMemo(() => {
+    const contactRequired = useComputed(() => {
         return accountChanges.value.some((change) =>
             change.accountId === 0 || change.accountId === 1
         );
-    }, [accountChanges.value]);
+    });
+
+    useEffect(() => {
+        refreshCategories();
+    }, []);
 
     return (
         <>
@@ -36,8 +41,8 @@ const Ledger = () => {
                 <section>
                     <h2>Categories</h2>
                     <ul>
-                        {placeholder.categories.map((category, i) => {
-                            return <li key={i}>{category}</li>;
+                        {categories.value.map((category) => {
+                            return <li key={category.id}>{category.name}</li>;
                         })}
                     </ul>
                     <GenericForm
@@ -265,7 +270,7 @@ const Ledger = () => {
                             </button>
                         )}
 
-                        {contactRequired &&
+                        {contactRequired.value &&
                             (
                                 <label htmlFor="transaction_contact_element">
                                     Contact

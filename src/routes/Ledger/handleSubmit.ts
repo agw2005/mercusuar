@@ -1,4 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
+import { db, post } from "#/libs/db.ts";
+import { refreshCategories } from "../../libs/store/categories";
 
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -10,12 +12,8 @@ const handleSubmit = async (e: SubmitEvent) => {
         case "category":
             {
                 const name = String(formData.get("category_name") ?? "").trim();
-                console.log({
-                    form: formType,
-                    data: {
-                        name,
-                    },
-                });
+                await db.execute(post.category, [name]);
+                await refreshCategories();
             }
             break;
         case "account":
