@@ -8,7 +8,7 @@ pub struct DbState {
     pub pool: SqlitePool,
 }
 
-pub async fn init_ledger(db_path: &Path) -> Result<SqlitePool, sqlx::Error> {
+pub async fn init_db(db_path: &Path) -> Result<SqlitePool, sqlx::Error> {
     let options = SqliteConnectOptions::new()
         .filename(db_path)
         .create_if_missing(true)
@@ -20,9 +20,7 @@ pub async fn init_ledger(db_path: &Path) -> Result<SqlitePool, sqlx::Error> {
         .await?;
 
     // Run your existing schema + triggers + seed data
-    sqlx::raw_sql(include_str!("../sql/ledger.sql"))
-        .execute(&pool)
-        .await?;
+    sqlx::migrate!("./migrations").run(&pool).await?;
 
     Ok(pool)
 }

@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS Habits (
     positive BOOLEAN NOT NULL DEFAULT 1,
     stackable BOOLEAN NOT NULL DEFAULT 0,
     metric TEXT,
-    quantity DECIMAL,
-    output DECIMAL NOT NULL,
+    quantity REAL,
+    output REAL NOT NULL,
     archived BOOLEAN NOT NULL DEFAULT 0
 );
 
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Trackers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     habit_id INTEGER NOT NULL,
     date DATETIME NOT NULL,
-    quantity DECIMAL,
+    quantity REAL,
     description TEXT,
     FOREIGN KEY (habit_id) REFERENCES Habits(id)
 );

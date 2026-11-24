@@ -19,7 +19,7 @@ pub fn run() {
 
             let db_path = app_data_dir.join("test.db");
 
-            let pool = tauri::async_runtime::block_on(db::init_ledger(&db_path))
+            let pool = tauri::async_runtime::block_on(db::init_db(&db_path))
                 .expect("failed to initialize database");
 
             app.manage(db::DbState { pool });
