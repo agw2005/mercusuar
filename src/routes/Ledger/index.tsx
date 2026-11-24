@@ -242,7 +242,7 @@ const Ledger = () => {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Date</th>{" "}
+                                        <th>Date</th>
                                         {/* Iterate through all unarchived accounts + archived accounts that is inside the transactions array */}
                                         {accountsInTransactions(
                                             transactionsAtMonth.value,
@@ -392,10 +392,18 @@ const Ledger = () => {
                                                         debtChange.value}
                                                 </td>
                                                 <td>
-                                                    Sum at this
-                                                    row(NonSystemAccounts +
-                                                    Receivables + Investments -
-                                                    Debts)
+                                                    {transaction.changes.reduce(
+                                                        (acc, curr) => {
+                                                            return curr
+                                                                    .accountId ===
+                                                                    DEBT_ACCOUNT_ID
+                                                                ? acc -
+                                                                    curr.value
+                                                                : acc +
+                                                                    curr.value;
+                                                        },
+                                                        0,
+                                                    )}
                                                 </td>
                                                 <td>
                                                     {allCategories.value
