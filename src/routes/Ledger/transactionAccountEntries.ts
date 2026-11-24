@@ -4,7 +4,6 @@ import { allAccounts } from "#/libs/store/accounts.ts";
 export interface AccountEntry {
     accountId: number;
     value: number | string;
-    sign: boolean;
 }
 
 export const addAccount = (entries: Signal<AccountEntry[]>) => {
@@ -18,7 +17,6 @@ export const addAccount = (entries: Signal<AccountEntry[]>) => {
             {
                 accountId: nextAvailableAccount.id,
                 value: "",
-                sign: false,
             },
         ];
     }
@@ -47,6 +45,5 @@ export const resetAccounts = (entries: Signal<AccountEntry[]>) => {
     entries.value = [{
         accountId: 1,
         value: "",
-        sign: false,
     }];
 };

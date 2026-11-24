@@ -46,7 +46,6 @@ const Ledger = () => {
     const accountChanges = useSignal<AccountEntry[]>([{
         accountId: 1,
         value: "",
-        sign: false,
     }]);
 
     const contactRequired = useComputed(() => {
@@ -621,24 +620,6 @@ const Ledger = () => {
                                         )}
                                     </select>
                                 </label>
-
-                                <input
-                                    type="hidden"
-                                    name="transaction_value_sign"
-                                    id={`transaction_value_sign_element_${rowIndex}`}
-                                    value={Number(entry.sign)}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        updateEntry(
-                                            accountChanges,
-                                            rowIndex,
-                                            { sign: !entry.sign },
-                                        )}
-                                >
-                                    {entry.sign ? "-" : "+"}
-                                </button>
 
                                 <label
                                     htmlFor={`transaction_value_element_${rowIndex}`}

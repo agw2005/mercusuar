@@ -57,7 +57,6 @@ const handleSubmit = async (e: SubmitEvent) => {
                 const category = Number(formData.get("transaction_category"));
                 const affectedAccounts = formData.getAll("transaction_account");
                 const values = formData.getAll("transaction_value");
-                const signs = formData.getAll("transaction_value_sign");
                 const rawContact = formData.get("transaction_contact");
                 const description = String(
                     formData.get("transaction_description"),
@@ -74,8 +73,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                     index,
                 ) => ({
                     accountId: Number(accountId),
-                    value: Number(values[index]) *
-                        (Boolean(Number(signs[index])) ? -1 : 1),
+                    value: Number(values[index]),
                 }));
 
                 const contact = rawContact === null ? null : Number(rawContact);
