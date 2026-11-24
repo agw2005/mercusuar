@@ -50,7 +50,7 @@ const Ledger = () => {
 
     const selectedDate = useSignal(dateToYearMonth(new Date()));
 
-    const contactRequired = useComputed(() => {
+    const entriesRequireContact = useComputed(() => {
         return accountChanges.value.some((change) =>
             change.accountId === RECEIVABLE_ACCOUNT_ID ||
             change.accountId === DEBT_ACCOUNT_ID
@@ -683,7 +683,7 @@ const Ledger = () => {
                             </button>
                         )}
 
-                        {contactRequired.value &&
+                        {entriesRequireContact.value &&
                             (
                                 <label htmlFor="transaction_contact_element">
                                     Contact
@@ -746,81 +746,60 @@ const Ledger = () => {
                     </GenericForm>
                 </section>
                 <section>
-                    <h2>Investments</h2>
+                    <h2>Investment Asset</h2>
                     <GenericForm
                         options={{
-                            formName: "investment",
+                            formName: "asset",
                             onSubmit: handleSubmit,
                         }}
                     >
-                        <label htmlFor="investment_fund_type_element">
+                        <label htmlFor="asset_fund_type_element">
                             Fund Type
                             <select
-                                name="investment_fund_type"
-                                id="investment_fund_type_element"
+                                name="asset_fund_type"
+                                id="asset_fund_type_element"
                             >
-                                {placeholder.fund_types.map((fund_type, i) => {
+                                {unarchivedFundTypes.value.filter((type) =>
+                                    !type.archived
+                                ).map((fund_type) => {
                                     return (
-                                        <option key={i} value={i}>
-                                            {fund_type}
+                                        <option
+                                            key={fund_type.id}
+                                            value={fund_type.id}
+                                        >
+                                            {fund_type.name}
                                         </option>
                                     );
                                 })}
                             </select>
                         </label>
-                        <label htmlFor="investment_name_element">
+                        <label htmlFor="asset_name_element">
                             Name
                             <input
                                 required
                                 type="text"
-                                name="investment_name"
-                                id="investment_name_element"
+                                name="asset_name"
+                                id="asset_name_element"
                             />
                         </label>
-                        <label htmlFor="investment_unit_element">
+                        <label htmlFor="asset_unit_element">
                             Unit
                             <input
                                 required
                                 type="text"
-                                name="investment_unit"
-                                id="investment_unit_element"
+                                name="asset_unit"
+                                id="asset_unit_element"
+                                placeholder="Ex: 1 mBTC"
                             />
                         </label>
-                        <label htmlFor="investment_quantity_element">
-                            Quantity
+
+                        <label htmlFor="asset_current_bid_element">
+                            Current Bid Price
                             <input
                                 required
                                 type="number"
-                                name="investment_quantity"
-                                id="investment_quantity_element"
-                                step="any"
-                            />
-                        </label>
-                        <label htmlFor="investment_source_account_element">
-                            Source Account
-                            <select
-                                required
-                                name="investment_source_account"
-                                id="investment_source_account_element"
-                            >
-                                {allAccounts.value.map((account) => {
-                                    return account.id === INVESTMENT_ACCOUNT_ID
-                                        ? void 0
-                                        : (
-                                            <option value={account.id}>
-                                                {account.name}
-                                            </option>
-                                        );
-                                })}
-                            </select>
-                        </label>
-                        <label htmlFor="investment_ask_element">
-                            Ask
-                            <input
-                                required
-                                type="number"
-                                name="investment_ask"
-                                id="investment_ask_element"
+                                name="asset_current_bid"
+                                id="asset_current_bid_element"
                                 step="any"
                             />
                         </label>

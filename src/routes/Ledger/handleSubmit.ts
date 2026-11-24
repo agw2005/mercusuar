@@ -18,7 +18,6 @@ import {
 } from "#/libs/store/transactions.ts";
 
 const TRANSFER_CATEGORY_ID = 1;
-// const INVESTMENT_CATEGORY_ID = 2;
 
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -100,15 +99,14 @@ const handleSubmit = async (e: SubmitEvent) => {
                 await refetchTransactionsAtMonth(month, year);
             }
             break;
-        case "investment":
+        case "asset":
             {
-                const fundTypeId = Number(formData.get("investment_fund_type"));
-                const name = String(formData.get("investment_name"));
-                const unit = String(formData.get("investment_unit"));
-                const quantity = Number(formData.get("investment_quantity"));
-                const ask = Number(formData.get("investment_ask"));
-                const bid = Number(formData.get("investment_ask"));
-                const status = true;
+                const fundTypeId = Number(formData.get("asset_fund_type"));
+                const name = String(formData.get("asset_name"));
+                const unit = String(formData.get("asset_unit"));
+                const currentBid = Number(
+                    formData.get("asset_current_bid"),
+                );
                 const lastUpdated = new Date().toISOString();
 
                 console.log({
@@ -117,10 +115,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                         fundTypeId,
                         name,
                         unit,
-                        quantity,
-                        ask,
-                        bid,
-                        status,
+                        currentBid,
                         lastUpdated,
                     },
                 });
