@@ -17,6 +17,9 @@ import {
     transactionsQuery,
 } from "#/libs/store/transactions.ts";
 
+const TRANSFER_CATEGORY_ID = 1;
+const INVESTMENT_CATEGORY_ID = 2;
+
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
@@ -54,7 +57,12 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         case "transaction":
             {
-                const category = Number(formData.get("transaction_category"));
+                const totalChange = Number(
+                    formData.get("transaction_equity_change"),
+                );
+                const category = totalChange === 0
+                    ? TRANSFER_CATEGORY_ID
+                    : Number(formData.get("transaction_category"));
                 const affectedAccounts = formData.getAll("transaction_account");
                 const values = formData.getAll("transaction_value");
                 const rawContact = formData.get("transaction_contact");

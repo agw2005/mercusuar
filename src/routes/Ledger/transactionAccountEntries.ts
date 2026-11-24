@@ -3,7 +3,7 @@ import { allAccounts } from "#/libs/store/accounts.ts";
 
 export interface AccountEntry {
     accountId: number;
-    value: number | string;
+    value: string;
 }
 
 export const addAccount = (entries: Signal<AccountEntry[]>) => {

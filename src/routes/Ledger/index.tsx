@@ -48,6 +48,8 @@ const Ledger = () => {
         value: "",
     }]);
 
+    const selectedDate = useSignal(dateToYearMonth(new Date()));
+
     const contactRequired = useComputed(() => {
         return accountChanges.value.some((change) =>
             change.accountId === RECEIVABLE_ACCOUNT_ID ||
@@ -55,7 +57,14 @@ const Ledger = () => {
         );
     });
 
-    const selectedDate = useSignal(dateToYearMonth(new Date()));
+    const totalChange = useComputed<number>(() => {
+        return accountChanges.value.reduce((acc, curr) => {
+            if (curr.accountId === DEBT_ACCOUNT_ID) {
+                return acc - (Number(curr.value) || 0);
+            }
+            return acc + (Number(curr.value) || 0);
+        }, 0);
+    });
 
     const transactionsGroupedByTime = useComputed<TransactionByTime[]>(() => {
         return transactionsAtMonth.value.reduce<TransactionByTime[]>(
@@ -560,6 +569,7 @@ const Ledger = () => {
                                 id="transaction_category_element"
                             >
                                 {allCategories.value.map((category) => {
+                                    if (category.is_system) return void 0;
                                     return (
                                         <option
                                             key={category.id}
@@ -570,7 +580,16 @@ const Ledger = () => {
                                     );
                                 })}
                             </select>
+                            if the equity change is 0, the category will be
+                            "Transfer" automatically.
                         </label>
+
+                        <input
+                            type="hidden"
+                            name="transaction_equity_change"
+                            value={totalChange.value}
+                        />
+
                         {accountChanges.value.map((entry, rowIndex) => (
                             <div key={rowIndex}>
                                 <label
@@ -710,6 +729,8 @@ const Ledger = () => {
                                 step="1"
                             />
                         </label>
+
+                        <p>{totalChange.value}</p>
                     </GenericForm>
                 </section>
                 <section>
