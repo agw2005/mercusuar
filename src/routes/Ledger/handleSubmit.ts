@@ -1,11 +1,8 @@
 import {
     categoriesQuery,
-    refetchUnarchivedCategories,
+    refetchAllCategories,
 } from "#/libs/store/categories.ts";
-import {
-    accountsQuery,
-    refetchUnarchivedAccounts,
-} from "#/libs/store/accounts.ts";
+import { accountsQuery, refetchAllAccounts } from "#/libs/store/accounts.ts";
 import {
     contactsQuery,
     refetchUnarchivedContacts,
@@ -31,14 +28,14 @@ const handleSubmit = async (e: SubmitEvent) => {
             {
                 const name = String(formData.get("category_name")).trim();
                 await categoriesQuery.post(name);
-                await refetchUnarchivedCategories();
+                await refetchAllCategories();
             }
             break;
         case "account":
             {
                 const name = String(formData.get("account_name")).trim();
                 await accountsQuery.post(name);
-                await refetchUnarchivedAccounts();
+                await refetchAllAccounts();
             }
             break;
         case "contact":
@@ -92,8 +89,8 @@ const handleSubmit = async (e: SubmitEvent) => {
                 );
 
                 const split = rawSelectedDate.split("-");
-                const year = Number(split[0])
-                const month = Number(split[1])
+                const year = Number(split[0]);
+                const month = Number(split[1]);
                 refetchTransactionsAtMonth(month, year);
             }
             break;

@@ -27,9 +27,9 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            ledger::categories::get_unarchived_categories,
+            ledger::categories::get_all_categories,
             ledger::categories::create_category,
-            ledger::accounts::get_unarchived_accounts,
+            ledger::accounts::get_all_accounts,
             ledger::accounts::create_account,
             ledger::contacts::get_unarchived_contacts,
             ledger::contacts::create_contact,

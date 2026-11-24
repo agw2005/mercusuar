@@ -12,11 +12,11 @@ pub struct Account {
 }
 
 #[tauri::command]
-pub async fn get_unarchived_accounts(
+pub async fn get_all_accounts(
     state: State<'_, DbState>,
 ) -> Result<Vec<Account>, String> {
     sqlx::query_as::<_, Account>(
-        "SELECT id, name, archived, is_system FROM Accounts WHERE archived = 0",
+        "SELECT id, name, archived, is_system FROM Accounts",
     )
     .fetch_all(&state.pool)
     .await

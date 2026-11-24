@@ -1,5 +1,5 @@
 import { Signal } from "@preact/signals";
-import { unarchivedAccounts } from "#/libs/store/accounts.ts";
+import { allAccounts } from "#/libs/store/accounts.ts";
 
 export interface AccountEntry {
     accountId: number;
@@ -9,7 +9,7 @@ export interface AccountEntry {
 
 export const addAccount = (entries: Signal<AccountEntry[]>) => {
     const usedIds = entries.value.map((entry) => entry.accountId);
-    const nextAvailableAccount = unarchivedAccounts.value.find(
+    const nextAvailableAccount = allAccounts.value.find(
         (account) => !usedIds.includes(account.id),
     );
     if (nextAvailableAccount) {

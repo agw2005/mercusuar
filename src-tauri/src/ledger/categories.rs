@@ -12,11 +12,11 @@ pub struct Category {
 }
 
 #[tauri::command]
-pub async fn get_unarchived_categories(
+pub async fn get_all_categories(
     state: State<'_, DbState>,
 ) -> Result<Vec<Category>, String> {
     sqlx::query_as::<_, Category>(
-        "SELECT id, name, archived, is_system FROM Categories WHERE archived = 0",
+        "SELECT id, name, archived, is_system FROM Categories",
     )
     .fetch_all(&state.pool)
     .await

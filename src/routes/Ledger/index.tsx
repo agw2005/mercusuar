@@ -11,13 +11,10 @@ import {
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
 import { useEffect } from "preact/hooks";
 import {
-    refetchUnarchivedCategories,
-    unarchivedCategories,
+    allCategories,
+    refetchAllCategories,
 } from "#/libs/store/categories.ts";
-import {
-    refetchUnarchivedAccounts,
-    unarchivedAccounts,
-} from "#/libs/store/accounts.ts";
+import { allAccounts, refetchAllAccounts } from "#/libs/store/accounts.ts";
 import {
     refetchUnarchivedContacts,
     unarchivedContacts,
@@ -33,6 +30,8 @@ import {
     transactionsAtMonth,
 } from "#/libs/store/transactions.ts";
 import type { AccountChange, TransactionByTime } from "#/types.d.ts";
+import { accountsInTransactions } from "#/libs/accountsInTransactions.ts";
+import { formatIsoToDayMonth } from "#/libs/ISOToDateMonth.ts";
 
 const RECEIVABLE_ACCOUNT_ID = 1;
 const DEBT_ACCOUNT_ID = 2;
@@ -85,8 +84,8 @@ const Ledger = () => {
     });
 
     useEffect(() => {
-        refetchUnarchivedCategories();
-        refetchUnarchivedAccounts();
+        refetchAllCategories();
+        refetchAllAccounts();
         refetchUnarchivedContacts();
         refetchUnarchivedFundTypes();
     }, []);
@@ -110,7 +109,7 @@ const Ledger = () => {
                 <section>
                     <h2>Categories</h2>
                     <ul>
-                        {unarchivedCategories.value.map((category) => {
+                        {allCategories.value.map((category) => {
                             return <li key={category.id}>{category.name}</li>;
                         })}
                     </ul>
@@ -133,7 +132,7 @@ const Ledger = () => {
                 <section>
                     <h2>Accounts</h2>
                     <ul>
-                        {unarchivedAccounts.value.map((account) => {
+                        {allAccounts.value.map((account) => {
                             return <li key={account.id}>{account.name}</li>;
                         })}
                     </ul>
@@ -237,8 +236,12 @@ const Ledger = () => {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
-                                        {unarchivedAccounts.value.map(
+                                        <th>Date</th>{" "}
+                                        {/* Iterate through all unarchived accounts + archived accounts that is inside the transactions array */}
+                                        {accountsInTransactions(
+                                            transactionsAtMonth.value,
+                                            allAccounts.value,
+                                        ).map(
                                             (account) => {
                                                 return account.id > 3
                                                     ? (
@@ -279,20 +282,35 @@ const Ledger = () => {
                                             );
                                         return (
                                             <tr key={transaction.date}>
-                                                <td>{transaction.date}</td>
-                                                {transaction
-                                                    .changes.filter((change) =>
-                                                        change.accountId > 3
-                                                    ).map(
-                                                        (change) => (
-                                                            <td
-                                                                key={change
-                                                                    .transactionId}
-                                                            >
-                                                                {change.value}
-                                                            </td>
-                                                        ),
+                                                <td>
+                                                    {formatIsoToDayMonth(
+                                                        transaction.date,
                                                     )}
+                                                </td>
+                                                {/* Prints out value or a padding <td> if no value exist in that account */}
+                                                {/* Except system accounts */}
+                                                {accountsInTransactions(
+                                                    transactionsAtMonth.value,
+                                                    allAccounts.value,
+                                                ).map((account) => {
+                                                    return account.id <= 3
+                                                        ? void 0
+                                                        : (
+                                                            <td
+                                                                key={account.id}
+                                                            >
+                                                                {transaction
+                                                                    .changes
+                                                                    .find((
+                                                                        change,
+                                                                    ) => change
+                                                                        .accountId ===
+                                                                        account
+                                                                            .id
+                                                                    )?.value}
+                                                            </td>
+                                                        );
+                                                })}
                                                 <td>
                                                     {investmentChange &&
                                                         investmentChange.value}
@@ -306,7 +324,7 @@ const Ledger = () => {
                                                         debtChange.value}
                                                 </td>
                                                 <td>
-                                                    {unarchivedCategories.value
+                                                    {allCategories.value
                                                         .find((category) =>
                                                             category.id ===
                                                                 transaction
@@ -340,7 +358,7 @@ const Ledger = () => {
                                 name="transaction_category"
                                 id="transaction_category_element"
                             >
-                                {unarchivedCategories.value.map((category) => {
+                                {allCategories.value.map((category) => {
                                     return (
                                         <option
                                             key={category.id}
@@ -373,7 +391,7 @@ const Ledger = () => {
                                                 },
                                             )}
                                     >
-                                        {unarchivedAccounts.value.map(
+                                        {allAccounts.value.map(
                                             (account) => {
                                                 const alreadyExist =
                                                     accountChanges.value.some(

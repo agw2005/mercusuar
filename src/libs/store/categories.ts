@@ -2,19 +2,19 @@ import { signal } from "@preact/signals";
 import type { Categories } from "#/types.d.ts";
 import { invoke } from "@tauri-apps/api/core";
 
-export const unarchivedCategories = signal<Categories[]>([]);
+export const allCategories = signal<Categories[]>([]);
 
-export const refetchUnarchivedCategories = async () => {
+export const refetchAllCategories = async () => {
     try {
-        unarchivedCategories.value = await categoriesQuery.get.all_unarchived();
+        allCategories.value = await categoriesQuery.get.all();
     } catch (error) {
-        console.error("Failed to fetch unarchived categories:", error);
+        console.error("Failed to fetch all categories:", error);
     }
 };
 
 export const categoriesQuery = {
     get: {
-        all_unarchived: () => invoke<Categories[]>("get_unarchived_categories"),
+        all: () => invoke<Categories[]>("get_all_categories"),
     },
     post: (name: string) => invoke<number>("create_category", { name }),
 };
