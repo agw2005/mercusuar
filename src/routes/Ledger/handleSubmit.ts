@@ -80,7 +80,7 @@ const handleSubmit = async (e: SubmitEvent) => {
 
                 const contact = rawContact === null ? null : Number(rawContact);
 
-                transactionsQuery.post(
+                await transactionsQuery.post(
                     category,
                     changes,
                     contact,
@@ -91,7 +91,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                 const split = rawSelectedDate.split("-");
                 const year = Number(split[0]);
                 const month = Number(split[1]);
-                refetchTransactionsAtMonth(month, year);
+                await refetchTransactionsAtMonth(month, year);
             }
             break;
         case "investment":
