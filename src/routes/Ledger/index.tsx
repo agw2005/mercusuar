@@ -212,6 +212,7 @@ const Ledger = () => {
                         <label htmlFor="category_name_element">
                             Name
                             <input
+                                required
                                 type="text"
                                 name="category_name"
                                 id="category_name_element"
@@ -235,6 +236,7 @@ const Ledger = () => {
                         <label htmlFor="account_name_element">
                             Name
                             <input
+                                required
                                 type="text"
                                 name="account_name"
                                 id="account_name_element"
@@ -258,6 +260,7 @@ const Ledger = () => {
                         <label htmlFor="contact_name_element">
                             Name
                             <input
+                                required
                                 type="text"
                                 name="contact_name"
                                 id="contact_name_element"
@@ -281,6 +284,7 @@ const Ledger = () => {
                         <label htmlFor="fund_type_name_element">
                             Name
                             <input
+                                required
                                 type="text"
                                 name="fund_type_name"
                                 id="fund_type_name_element"
@@ -557,11 +561,6 @@ const Ledger = () => {
                             onReset: () => resetAccounts(accountChanges),
                         }}
                     >
-                        <input
-                            type="hidden"
-                            name="selected_date"
-                            value={selectedDate.value}
-                        />
                         <label htmlFor="transaction_category_element">
                             Category
                             <select
@@ -583,12 +582,6 @@ const Ledger = () => {
                             if the equity change is 0, the category will be
                             "Transfer" automatically.
                         </label>
-
-                        <input
-                            type="hidden"
-                            name="transaction_equity_change"
-                            value={totalChange.value}
-                        />
 
                         {accountChanges.value.map((entry, rowIndex) => (
                             <div key={rowIndex}>
@@ -645,6 +638,7 @@ const Ledger = () => {
                                 >
                                     Value
                                     <input
+                                        required
                                         type="number"
                                         step="any"
                                         name="transaction_value"
@@ -723,12 +717,30 @@ const Ledger = () => {
                         <label htmlFor="transaction_date_element">
                             Date
                             <input
+                                required
+                                defaultValue={new Date()
+                                    .toISOString()
+                                    .slice(0, 16)}
                                 type="datetime-local"
                                 name="transaction_date"
                                 id="transaction_date_element"
                                 step="1"
                             />
                         </label>
+
+                        {/* For refetch */}
+                        <input
+                            type="hidden"
+                            name="selected_date"
+                            value={selectedDate.value}
+                        />
+
+                        {/* For flipping category to "Transfer" */}
+                        <input
+                            type="hidden"
+                            name="transaction_equity_change"
+                            value={totalChange.value}
+                        />
 
                         <p>{totalChange.value}</p>
                     </GenericForm>
@@ -759,6 +771,7 @@ const Ledger = () => {
                         <label htmlFor="investment_name_element">
                             Name
                             <input
+                                required
                                 type="text"
                                 name="investment_name"
                                 id="investment_name_element"
@@ -767,6 +780,7 @@ const Ledger = () => {
                         <label htmlFor="investment_unit_element">
                             Unit
                             <input
+                                required
                                 type="text"
                                 name="investment_unit"
                                 id="investment_unit_element"
@@ -775,15 +789,35 @@ const Ledger = () => {
                         <label htmlFor="investment_quantity_element">
                             Quantity
                             <input
+                                required
                                 type="number"
                                 name="investment_quantity"
                                 id="investment_quantity_element"
                                 step="any"
                             />
                         </label>
+                        <label htmlFor="investment_source_account_element">
+                            Source Account
+                            <select
+                                required
+                                name="investment_source_account"
+                                id="investment_source_account_element"
+                            >
+                                {allAccounts.value.map((account) => {
+                                    return account.id === INVESTMENT_ACCOUNT_ID
+                                        ? void 0
+                                        : (
+                                            <option value={account.id}>
+                                                {account.name}
+                                            </option>
+                                        );
+                                })}
+                            </select>
+                        </label>
                         <label htmlFor="investment_ask_element">
                             Ask
                             <input
+                                required
                                 type="number"
                                 name="investment_ask"
                                 id="investment_ask_element"

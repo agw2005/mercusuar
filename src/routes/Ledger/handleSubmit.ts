@@ -18,7 +18,7 @@ import {
 } from "#/libs/store/transactions.ts";
 
 const TRANSFER_CATEGORY_ID = 1;
-const INVESTMENT_CATEGORY_ID = 2;
+// const INVESTMENT_CATEGORY_ID = 2;
 
 const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
