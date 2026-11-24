@@ -60,3 +60,7 @@ export interface TransactionByTime {
     description: string;
     date: string;
 }
+
+export interface AccountBalance extends Accounts {
+    balance: number;
+}

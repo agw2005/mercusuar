@@ -14,7 +14,12 @@ import {
     allCategories,
     refetchAllCategories,
 } from "#/libs/store/categories.ts";
-import { allAccounts, refetchAllAccounts } from "#/libs/store/accounts.ts";
+import {
+    allAccounts,
+    balances,
+    refetchAllAccounts,
+    refetchBalances,
+} from "#/libs/store/accounts.ts";
 import {
     refetchUnarchivedContacts,
     unarchivedContacts,
@@ -23,7 +28,7 @@ import {
     refetchUnarchivedFundTypes,
     unarchivedFundTypes,
 } from "#/libs/store/fundType.ts";
-import { dateToMonthYear } from "#/libs/dateToMonthYear.ts";
+import { dateToYearMonth } from "#/libs/dateToMonthYear.ts";
 import { offsetMonthYear } from "#/libs/offsetMonthYear.ts";
 import {
     refetchTransactionsAtMonth,
@@ -51,7 +56,7 @@ const Ledger = () => {
         );
     });
 
-    const selectedDate = useSignal(dateToMonthYear(new Date()));
+    const selectedDate = useSignal(dateToYearMonth(new Date()));
 
     const transactionsGroupedByTime = useComputed<TransactionByTime[]>(() => {
         return transactionsAtMonth.value.reduce<TransactionByTime[]>(
@@ -95,6 +100,7 @@ const Ledger = () => {
         const year = Number(split[0]);
         const month = Number(split[1]);
         refetchTransactionsAtMonth(month, year);
+        refetchBalances(month, year);
     }, [selectedDate.value]);
 
     return (
@@ -255,11 +261,73 @@ const Ledger = () => {
                                         <th>Investment</th>
                                         <th>Receivable</th>
                                         <th>Debt</th>
+                                        <th>Equity</th>
                                         <th>Category</th>
                                         <th>Description</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {
+                                        /*
+                                        Get starting balance of all available
+                                        accounts (unarchived + archived but
+                                        inside transactions) for this month
+                                        and year
+                                        */
+                                    }
+                                    <tr>
+                                        <td>
+                                            {formatIsoToDayMonth(
+                                                new Date(selectedDate.value)
+                                                    .toISOString(),
+                                            )}
+                                        </td>
+                                        {accountsInTransactions(
+                                            transactionsAtMonth.value,
+                                            balances.value,
+                                        ).map((account) => {
+                                            return account.id <= 3
+                                                ? void 0
+                                                : (
+                                                    <td
+                                                        key={account.id}
+                                                    >
+                                                        {account.balance}
+                                                    </td>
+                                                );
+                                        })}
+                                        <td>
+                                            {balances.value.find((account) =>
+                                                account.id ===
+                                                    INVESTMENT_ACCOUNT_ID
+                                            )?.balance || 0}
+                                        </td>
+                                        <td>
+                                            {balances.value.find((account) =>
+                                                account.id ===
+                                                    RECEIVABLE_ACCOUNT_ID
+                                            )?.balance || 0}
+                                        </td>
+                                        <td>
+                                            {balances.value.find((account) =>
+                                                account.id ===
+                                                    DEBT_ACCOUNT_ID
+                                            )?.balance || 0}
+                                        </td>
+                                        <td>
+                                            {balances.value.reduce(
+                                                (acc, curr) => {
+                                                    return curr.id ===
+                                                            DEBT_ACCOUNT_ID
+                                                        ? acc - curr.balance
+                                                        : acc + curr.balance;
+                                                },
+                                                0,
+                                            )}
+                                        </td>
+                                        <td>-</td>
+                                        <td>Starting Balance</td>
+                                    </tr>
                                     {transactionsGroupedByTime.value.map((
                                         transaction,
                                     ) => {
@@ -322,6 +390,12 @@ const Ledger = () => {
                                                 <td>
                                                     {debtChange &&
                                                         debtChange.value}
+                                                </td>
+                                                <td>
+                                                    Sum at this
+                                                    row(NonSystemAccounts +
+                                                    Receivables + Investments -
+                                                    Debts)
                                                 </td>
                                                 <td>
                                                     {allCategories.value

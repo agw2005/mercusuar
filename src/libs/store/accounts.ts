@@ -1,8 +1,10 @@
 import { signal } from "@preact/signals";
-import type { Accounts } from "#/types.d.ts";
+import type { AccountBalance, Accounts } from "#/types.d.ts";
 import { invoke } from "@tauri-apps/api/core";
+import { dateISORange } from "../dateISORange";
 
 export const allAccounts = signal<Accounts[]>([]);
+export const balances = signal<AccountBalance[]>([]);
 
 export const refetchAllAccounts = async () => {
     try {
@@ -12,9 +14,21 @@ export const refetchAllAccounts = async () => {
     }
 };
 
+export const refetchBalances = async (m: number, y: number) => {
+    try {
+        balances.value = await accountsQuery.get.starting_balance(m, y);
+    } catch (error) {
+        console.error("Failed to fetch balances:", error);
+    }
+};
+
 export const accountsQuery = {
     get: {
         all: () => invoke<Accounts[]>("get_all_accounts"),
+        starting_balance: (m: number, y: number) => {
+            const [start, _end] = dateISORange(m, y);
+            return invoke<AccountBalance[]>("balances_until_date", { start });
+        },
     },
     post: (name: string) => invoke<number>("create_account", { name }),
 };

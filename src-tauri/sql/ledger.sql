@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS Transactions (
 CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON Transactions(category_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_account_id ON Transactions(account_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_date ON Transactions(date);
+CREATE INDEX IF NOT EXISTS idx_transactions_account_date_value
+ON Transactions(account_id, date, value);
 
 CREATE TABLE IF NOT EXISTS Receivables (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
