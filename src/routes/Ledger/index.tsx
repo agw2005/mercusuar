@@ -37,6 +37,10 @@ import {
 import type { AccountChange, TransactionByTime } from "#/types.d.ts";
 import { accountsInTransactions } from "#/libs/accountsInTransactions.ts";
 import { formatIsoToDayMonth } from "#/libs/ISOToDateMonth.ts";
+import {
+    refetchInvestments,
+    unarchivedInvestments,
+} from "#/libs/store/investments.ts";
 
 const RECEIVABLE_ACCOUNT_ID = 1;
 const DEBT_ACCOUNT_ID = 2;
@@ -177,6 +181,7 @@ const Ledger = () => {
         refetchAllAccounts();
         refetchUnarchivedContacts();
         refetchUnarchivedFundTypes();
+        refetchInvestments();
     }, []);
 
     useEffect(() => {
@@ -747,17 +752,29 @@ const Ledger = () => {
                 </section>
                 <section>
                     <h2>Investment Asset</h2>
+                    <ul>
+                        {unarchivedInvestments.value.map((asset) => (
+                            <li key={asset.id}>
+                                {asset.name}{" "}
+                                ({unarchivedFundTypes.value.find((fundType) =>
+                                    fundType.id === asset.fund_type_id
+                                )?.name}) [{formatIsoToDayMonth(
+                                    asset.last_updated,
+                                )}: {asset.unit} = {asset.current_bid}]
+                            </li>
+                        ))}
+                    </ul>
                     <GenericForm
                         options={{
-                            formName: "asset",
+                            formName: "investment_asset",
                             onSubmit: handleSubmit,
                         }}
                     >
-                        <label htmlFor="asset_fund_type_element">
+                        <label htmlFor="investment_asset_fund_type_element">
                             Fund Type
                             <select
-                                name="asset_fund_type"
-                                id="asset_fund_type_element"
+                                name="investment_asset_fund_type"
+                                id="investment_asset_fund_type_element"
                             >
                                 {unarchivedFundTypes.value.filter((type) =>
                                     !type.archived
@@ -773,33 +790,33 @@ const Ledger = () => {
                                 })}
                             </select>
                         </label>
-                        <label htmlFor="asset_name_element">
+                        <label htmlFor="investment_asset_name_element">
                             Name
                             <input
                                 required
                                 type="text"
-                                name="asset_name"
-                                id="asset_name_element"
+                                name="investment_asset_name"
+                                id="investment_asset_name_element"
                             />
                         </label>
-                        <label htmlFor="asset_unit_element">
+                        <label htmlFor="investment_asset_unit_element">
                             Unit
                             <input
                                 required
                                 type="text"
-                                name="asset_unit"
-                                id="asset_unit_element"
+                                name="investment_asset_unit"
+                                id="investment_asset_unit_element"
                                 placeholder="Ex: 1 mBTC"
                             />
                         </label>
 
-                        <label htmlFor="asset_current_bid_element">
+                        <label htmlFor="investment_asset_current_bid_element">
                             Current Bid Price
                             <input
                                 required
                                 type="number"
-                                name="asset_current_bid"
-                                id="asset_current_bid_element"
+                                name="investment_asset_current_bid"
+                                id="investment_asset_current_bid_element"
                                 step="any"
                             />
                         </label>

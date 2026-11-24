@@ -47,6 +47,47 @@ export interface Debts {
     contact_id: number;
 }
 
+export interface Investments {
+    id: number;
+    fund_type_id: number;
+    name: string;
+    unit: string;
+    current_bid: number;
+    last_updated: string;
+    archived: boolean;
+}
+
+export interface Investments {
+    id: number;
+    fund_type_id: number;
+    name: string;
+    unit: string;
+    current_bid: number;
+    last_updated: string;
+    archived: boolean;
+}
+
+export interface Investment_Lots {
+    id: number;
+    investment_id: number;
+    buy_transaction_id: number;
+    initial_quantity: number;
+    remaining_quantity: number;
+    unit_cost: number;
+    holding: boolean;
+    purchased_at: string;
+}
+
+export interface Investment_Sales {
+    id: number;
+    lot_id: number;
+    proceeds_transaction_id: number;
+    basis_transaction_id: number;
+    quantity_sold: number;
+    unit_price: number;
+    sold_at: string;
+}
+
 // Custom types
 
 export interface AccountChange {

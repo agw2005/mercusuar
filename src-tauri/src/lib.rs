@@ -37,6 +37,8 @@ pub fn run() {
             ledger::fund_types::create_fund_type,
             ledger::transactions::get_transactions_at_month,
             ledger::transactions::create_transaction,
+            ledger::investments::get_unarchived_investments,
+            ledger::investments::create_investment,
             habit::habit_ping,
             health::health_ping
         ])

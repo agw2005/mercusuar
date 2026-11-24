@@ -43,7 +43,7 @@ pub async fn balances_until_date(
             a.is_system
         ORDER BY a.id;",
     )
-    .bind(start)
+    .bind(&start)
     .fetch_all(&state.pool)
     .await
     .map_err(|e| format!("Failed to fetch balances per account: {e}"))
