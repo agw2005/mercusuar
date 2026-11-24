@@ -88,6 +88,82 @@ const Ledger = () => {
         );
     });
 
+    const calculateEquity = (balanceMap: Record<number, number>) => {
+        return Object.entries(balanceMap).reduce((acc, [id, val]) => {
+            return Number(id) === DEBT_ACCOUNT_ID ? acc - val : acc + val;
+        }, 0);
+    };
+
+    // Compute non-system visible columns once so headers and rows always stay aligned
+    const visibleCustomAccounts = useComputed(() => {
+        return accountsInTransactions(
+            transactionsAtMonth.value,
+            allAccounts.value,
+        ).filter((account) => account.id > 3);
+    });
+
+    const startingBalanceMap = useComputed<Record<number, number>>(() => {
+        const map: Record<number, number> = {};
+        for (const acc of balances.value) {
+            map[acc.id] = acc.balance;
+        }
+        return map;
+    });
+
+    const startingEquity = useComputed(() =>
+        calculateEquity(startingBalanceMap.value)
+    );
+
+    // Group transactions by day and compute end-of-day running balances (prefix sum)
+    const dailyLedgers = useComputed(() => {
+        const runningBalances: Record<number, number> = {
+            ...startingBalanceMap.value,
+        };
+
+        const days: {
+            dayLabel: string;
+            transactions: TransactionByTime[];
+            endOfDayBalances: Record<number, number>;
+            endOfDayEquity: number;
+        }[] = [];
+
+        for (const tx of transactionsGroupedByTime.value) {
+            const dayLabel = formatIsoToDayMonth(tx.date);
+            let currentDay = days[days.length - 1];
+
+            if (!currentDay || currentDay.dayLabel !== dayLabel) {
+                currentDay = {
+                    dayLabel,
+                    transactions: [],
+                    endOfDayBalances: {},
+                    endOfDayEquity: 0,
+                };
+                days.push(currentDay);
+            }
+
+            currentDay.transactions.push(tx);
+
+            for (const change of tx.changes) {
+                runningBalances[change.accountId] =
+                    (runningBalances[change.accountId] ?? 0) + change.value;
+            }
+
+            // Snapshot cumulative state at the end of this transaction (final snapshot = end of day)
+            currentDay.endOfDayBalances = { ...runningBalances };
+            currentDay.endOfDayEquity = calculateEquity(runningBalances);
+        }
+
+        return days;
+    });
+
+    const startingDayLabel = useComputed(() =>
+        formatIsoToDayMonth(new Date(selectedDate.value).toISOString())
+    );
+
+    const hasFirstDayTransactions = useComputed(() =>
+        dailyLedgers.value[0]?.dayLabel === startingDayLabel.value
+    );
+
     useEffect(() => {
         refetchAllCategories();
         refetchAllAccounts();
@@ -243,21 +319,13 @@ const Ledger = () => {
                                 <thead>
                                     <tr>
                                         <th>Date</th>
-                                        {/* Iterate through all unarchived accounts + archived accounts that is inside the transactions array */}
-                                        {accountsInTransactions(
-                                            transactionsAtMonth.value,
-                                            allAccounts.value,
-                                        ).map(
-                                            (account) => {
-                                                return account.id > 3
-                                                    ? (
-                                                        <th key={account.id}>
-                                                            {account.name}
-                                                        </th>
-                                                    )
-                                                    : void 0;
-                                            },
-                                        )}
+                                        {visibleCustomAccounts.value.map((
+                                            account,
+                                        ) => (
+                                            <th key={account.id}>
+                                                {account.name}
+                                            </th>
+                                        ))}
                                         <th>Investment</th>
                                         <th>Receivable</th>
                                         <th>Debt</th>
@@ -267,158 +335,210 @@ const Ledger = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {
-                                        /*
-                                        Get starting balance of all available
-                                        accounts (unarchived + archived but
-                                        inside transactions) for this month
-                                        and year
-                                        */
-                                    }
+                                    {/* Starting Balance Row */}
                                     <tr>
+                                        <td>{startingDayLabel.value}</td>
+                                        {visibleCustomAccounts.value.map((
+                                            account,
+                                        ) => (
+                                            <td key={account.id}>
+                                                {startingBalanceMap
+                                                    .value[account.id] ?? 0}
+                                            </td>
+                                        ))}
                                         <td>
-                                            {formatIsoToDayMonth(
-                                                new Date(selectedDate.value)
-                                                    .toISOString(),
-                                            )}
-                                        </td>
-                                        {accountsInTransactions(
-                                            transactionsAtMonth.value,
-                                            balances.value,
-                                        ).map((account) => {
-                                            return account.id <= 3
-                                                ? void 0
-                                                : (
-                                                    <td
-                                                        key={account.id}
-                                                    >
-                                                        {account.balance}
-                                                    </td>
-                                                );
-                                        })}
-                                        <td>
-                                            {balances.value.find((account) =>
-                                                account.id ===
-                                                    INVESTMENT_ACCOUNT_ID
-                                            )?.balance || 0}
+                                            {startingBalanceMap
+                                                .value[INVESTMENT_ACCOUNT_ID] ??
+                                                0}
                                         </td>
                                         <td>
-                                            {balances.value.find((account) =>
-                                                account.id ===
-                                                    RECEIVABLE_ACCOUNT_ID
-                                            )?.balance || 0}
+                                            {startingBalanceMap
+                                                .value[RECEIVABLE_ACCOUNT_ID] ??
+                                                0}
                                         </td>
                                         <td>
-                                            {balances.value.find((account) =>
-                                                account.id ===
-                                                    DEBT_ACCOUNT_ID
-                                            )?.balance || 0}
+                                            {startingBalanceMap
+                                                .value[DEBT_ACCOUNT_ID] ?? 0}
                                         </td>
-                                        <td>
-                                            {balances.value.reduce(
-                                                (acc, curr) => {
-                                                    return curr.id ===
-                                                            DEBT_ACCOUNT_ID
-                                                        ? acc - curr.balance
-                                                        : acc + curr.balance;
-                                                },
-                                                0,
-                                            )}
-                                        </td>
+                                        <td>{startingEquity.value}</td>
                                         <td>-</td>
                                         <td>Starting Balance</td>
                                     </tr>
-                                    {transactionsGroupedByTime.value.map((
-                                        transaction,
-                                    ) => {
-                                        const receivableChange = transaction
-                                            .changes
-                                            .find((change) =>
-                                                change.accountId ===
-                                                    RECEIVABLE_ACCOUNT_ID
-                                            );
-                                        const debtChange = transaction.changes
-                                            .find((change) =>
-                                                change.accountId ===
-                                                    DEBT_ACCOUNT_ID
-                                            );
-                                        const investmentChange = transaction
-                                            .changes
-                                            .find((change) =>
-                                                change.accountId ===
-                                                    INVESTMENT_ACCOUNT_ID
-                                            );
-                                        return (
-                                            <tr key={transaction.date}>
-                                                <td>
-                                                    {formatIsoToDayMonth(
-                                                        transaction.date,
-                                                    )}
+
+                                    {/* Only render a standalone Balance row for day 1 if no transactions occurred on day 1 */}
+                                    {!hasFirstDayTransactions.value && (
+                                        <tr>
+                                            <td>Balance</td>
+                                            {visibleCustomAccounts.value.map((
+                                                account,
+                                            ) => (
+                                                <td key={account.id}>
+                                                    {startingBalanceMap
+                                                        .value[account.id] ?? 0}
                                                 </td>
-                                                {/* Prints out value or a padding <td> if no value exist in that account */}
-                                                {/* Except system accounts */}
-                                                {accountsInTransactions(
-                                                    transactionsAtMonth.value,
-                                                    allAccounts.value,
-                                                ).map((account) => {
-                                                    return account.id <= 3
-                                                        ? void 0
-                                                        : (
-                                                            <td
-                                                                key={account.id}
-                                                            >
+                                            ))}
+                                            <td>
+                                                {startingBalanceMap
+                                                    .value[
+                                                        INVESTMENT_ACCOUNT_ID
+                                                    ] ?? 0}
+                                            </td>
+                                            <td>
+                                                {startingBalanceMap
+                                                    .value[
+                                                        RECEIVABLE_ACCOUNT_ID
+                                                    ] ?? 0}
+                                            </td>
+                                            <td>
+                                                {startingBalanceMap
+                                                    .value[DEBT_ACCOUNT_ID] ??
+                                                    0}
+                                            </td>
+                                            <td>{startingEquity.value}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                    )}
+
+                                    {/* Daily Transactions + End-of-Day Balance Rows */}
+                                    {dailyLedgers.value.map((day) => (
+                                        <>
+                                            {day.transactions.map(
+                                                (transaction) => {
+                                                    const receivableChange =
+                                                        transaction.changes
+                                                            .find(
+                                                                (change) =>
+                                                                    change
+                                                                        .accountId ===
+                                                                        RECEIVABLE_ACCOUNT_ID,
+                                                            );
+                                                    const debtChange =
+                                                        transaction.changes
+                                                            .find(
+                                                                (change) =>
+                                                                    change
+                                                                        .accountId ===
+                                                                        DEBT_ACCOUNT_ID,
+                                                            );
+                                                    const investmentChange =
+                                                        transaction.changes
+                                                            .find(
+                                                                (change) =>
+                                                                    change
+                                                                        .accountId ===
+                                                                        INVESTMENT_ACCOUNT_ID,
+                                                            );
+
+                                                    return (
+                                                        <tr
+                                                            key={transaction
+                                                                .date}
+                                                        >
+                                                            <td>
+                                                                {day.dayLabel}
+                                                            </td>
+                                                            {visibleCustomAccounts
+                                                                .value.map((
+                                                                    account,
+                                                                ) => (
+                                                                    <td
+                                                                        key={account
+                                                                            .id}
+                                                                    >
+                                                                        {transaction
+                                                                            .changes
+                                                                            .find(
+                                                                                (
+                                                                                    change,
+                                                                                ) => change
+                                                                                    .accountId ===
+                                                                                    account
+                                                                                        .id,
+                                                                            )?.value}
+                                                                    </td>
+                                                                ))}
+                                                            <td>
+                                                                {investmentChange
+                                                                    ?.value}
+                                                            </td>
+                                                            <td>
+                                                                {receivableChange
+                                                                    ?.value}
+                                                            </td>
+                                                            <td>
+                                                                {debtChange
+                                                                    ?.value}
+                                                            </td>
+                                                            <td>
                                                                 {transaction
                                                                     .changes
-                                                                    .find((
-                                                                        change,
-                                                                    ) => change
-                                                                        .accountId ===
-                                                                        account
-                                                                            .id
-                                                                    )?.value}
+                                                                    .reduce(
+                                                                        (
+                                                                            acc,
+                                                                            curr,
+                                                                        ) => curr
+                                                                                .accountId ===
+                                                                                DEBT_ACCOUNT_ID
+                                                                            ? acc -
+                                                                                curr.value
+                                                                            : acc +
+                                                                                curr.value,
+                                                                        0,
+                                                                    )}
                                                             </td>
-                                                        );
-                                                })}
+                                                            <td>
+                                                                {allCategories
+                                                                    .value.find(
+                                                                        (
+                                                                            category,
+                                                                        ) => category
+                                                                            .id ===
+                                                                            transaction
+                                                                                .category,
+                                                                    )?.name}
+                                                            </td>
+                                                            <td>
+                                                                {transaction
+                                                                    .description}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                },
+                                            )}
+
+                                            {/* End-of-Day Running Balance Row */}
+                                            <tr key={`balance-${day.dayLabel}`}>
+                                                <td>Balance</td>
+                                                {visibleCustomAccounts.value
+                                                    .map((account) => (
+                                                        <td key={account.id}>
+                                                            {day.endOfDayBalances[
+                                                                account.id
+                                                            ] ?? 0}
+                                                        </td>
+                                                    ))}
                                                 <td>
-                                                    {investmentChange &&
-                                                        investmentChange.value}
+                                                    {day.endOfDayBalances[
+                                                        INVESTMENT_ACCOUNT_ID
+                                                    ] ?? 0}
                                                 </td>
                                                 <td>
-                                                    {receivableChange &&
-                                                        receivableChange.value}
+                                                    {day.endOfDayBalances[
+                                                        RECEIVABLE_ACCOUNT_ID
+                                                    ] ?? 0}
                                                 </td>
                                                 <td>
-                                                    {debtChange &&
-                                                        debtChange.value}
+                                                    {day.endOfDayBalances[
+                                                        DEBT_ACCOUNT_ID
+                                                    ] ?? 0}
                                                 </td>
-                                                <td>
-                                                    {transaction.changes.reduce(
-                                                        (acc, curr) => {
-                                                            return curr
-                                                                    .accountId ===
-                                                                    DEBT_ACCOUNT_ID
-                                                                ? acc -
-                                                                    curr.value
-                                                                : acc +
-                                                                    curr.value;
-                                                        },
-                                                        0,
-                                                    )}
-                                                </td>
-                                                <td>
-                                                    {allCategories.value
-                                                        .find((category) =>
-                                                            category.id ===
-                                                                transaction
-                                                                    .category
-                                                        )?.name}
-                                                </td>
-                                                <td>
-                                                    {transaction.description}
-                                                </td>
+                                                <td>{day.endOfDayEquity}</td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
-                                        );
-                                    })}
+                                        </>
+                                    ))}
                                 </tbody>
                             </table>
                         )}
