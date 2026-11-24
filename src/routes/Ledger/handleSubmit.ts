@@ -2,7 +2,11 @@ import {
     categoriesQuery,
     refetchAllCategories,
 } from "#/libs/store/categories.ts";
-import { accountsQuery, refetchAllAccounts } from "#/libs/store/accounts.ts";
+import {
+    accountsQuery,
+    refetchAllAccounts,
+    refetchBalances,
+} from "#/libs/store/accounts.ts";
 import {
     contactsQuery,
     refetchUnarchivedContacts,
@@ -20,6 +24,10 @@ import {
     investmentsQuery,
     refetchInvestments,
 } from "#/libs/store/investments.ts";
+import {
+    investmentLotsQuery,
+    refetchInvestmentLots,
+} from "#/libs/store/investmentLots.ts";
 
 const TRANSFER_CATEGORY_ID = 1;
 
@@ -101,6 +109,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                 const year = Number(split[0]);
                 const month = Number(split[1]);
                 await refetchTransactionsAtMonth(month, year);
+                await refetchBalances(month, year);
             }
             break;
         case "investment_asset":
@@ -122,6 +131,38 @@ const handleSubmit = async (e: SubmitEvent) => {
                     currentBid,
                     lastUpdated,
                 );
+                await refetchInvestments();
+            }
+            break;
+        case "investment_lot":
+            {
+                const investmentId = Number(formData.get("lot_asset"));
+                const quantity = Number(formData.get("lot_quantity"));
+                const unitCost = Number(formData.get("lot_current_price"));
+                const sourceAccount = Number(
+                    formData.get("lot_source_account"),
+                );
+                const sourceContact = formData.get("lot_source_contact")
+                    ? Number(formData.get("lot_source_contact"))
+                    : null;
+
+                const purchasedAt = new Date().toISOString();
+                const rawSelectedDate = String(formData.get("selected_date"));
+
+                await investmentLotsQuery.post(
+                    investmentId,
+                    quantity,
+                    unitCost,
+                    purchasedAt,
+                    sourceAccount,
+                    sourceContact,
+                );
+
+                const split = rawSelectedDate.split("-");
+                const year = Number(split[0]);
+                const month = Number(split[1]);
+                await refetchTransactionsAtMonth(month, year);
+                await refetchInvestmentLots();
                 await refetchInvestments();
             }
             break;

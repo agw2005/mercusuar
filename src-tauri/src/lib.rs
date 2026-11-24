@@ -39,6 +39,8 @@ pub fn run() {
             ledger::transactions::create_transaction,
             ledger::investments::get_unarchived_investments,
             ledger::investments::create_investment,
+            ledger::investment_lots::get_all_holdings,
+            ledger::investment_lots::purchase_lot,
             habit::habit_ping,
             health::health_ping
         ])

@@ -73,7 +73,7 @@ export interface Investment_Lots {
     buy_transaction_id: number;
     initial_quantity: number;
     remaining_quantity: number;
-    unit_cost: number;
+    unit_cost: number; // Ask price of a single unit at time of purchase
     holding: boolean;
     purchased_at: string;
 }

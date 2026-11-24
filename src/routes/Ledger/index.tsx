@@ -34,13 +34,22 @@ import {
     refetchTransactionsAtMonth,
     transactionsAtMonth,
 } from "#/libs/store/transactions.ts";
-import type { AccountChange, TransactionByTime } from "#/types.d.ts";
+import type {
+    AccountChange,
+    Investment_Lots,
+    Investments,
+    TransactionByTime,
+} from "#/types.d.ts";
 import { accountsInTransactions } from "#/libs/accountsInTransactions.ts";
 import { formatIsoToDayMonth } from "#/libs/ISOToDateMonth.ts";
 import {
     refetchInvestments,
     unarchivedInvestments,
 } from "#/libs/store/investments.ts";
+import {
+    refetchInvestmentLots,
+    unarchivedInvestmentLots,
+} from "#/libs/store/investmentLots.ts";
 
 const RECEIVABLE_ACCOUNT_ID = 1;
 const DEBT_ACCOUNT_ID = 2;
@@ -53,6 +62,23 @@ const Ledger = () => {
     }]);
 
     const selectedDate = useSignal(dateToYearMonth(new Date()));
+    const selectedAssetId = useSignal<number | null>(null);
+    const selectedAccountId = useSignal<number | null>(null);
+    const selectedLotId = useSignal<number | null>(null);
+
+    const selectedAsset = useComputed<Investments | null>(() => {
+        const id = selectedAssetId.value;
+        if (!id) return null;
+        return unarchivedInvestments.value.find((asset) => asset.id === id) ||
+            null;
+    });
+
+    const selectedLot = useComputed<Investment_Lots | null>(() => {
+        const id = selectedLotId.value;
+        if (!id) return null;
+        return unarchivedInvestmentLots.value.find((l) => l.id === id) ||
+            null;
+    });
 
     const entriesRequireContact = useComputed(() => {
         return accountChanges.value.some((change) =>
@@ -182,6 +208,7 @@ const Ledger = () => {
         refetchUnarchivedContacts();
         refetchUnarchivedFundTypes();
         refetchInvestments();
+        refetchInvestmentLots();
     }, []);
 
     useEffect(() => {
@@ -609,7 +636,9 @@ const Ledger = () => {
                                                 },
                                             )}
                                     >
-                                        {allAccounts.value.map(
+                                        {allAccounts.value.filter((a) =>
+                                            a.id !== INVESTMENT_ACCOUNT_ID
+                                        ).map(
                                             (account) => {
                                                 const alreadyExist =
                                                     accountChanges.value.some(
@@ -646,6 +675,7 @@ const Ledger = () => {
                                         required
                                         type="number"
                                         step="any"
+                                        min={Number.MIN_VALUE}
                                         name="transaction_value"
                                         id={`transaction_value_element_${rowIndex}`}
                                         value={entry.value}
@@ -751,7 +781,7 @@ const Ledger = () => {
                     </GenericForm>
                 </section>
                 <section>
-                    <h2>Investment Asset</h2>
+                    <h2>Investment Assets</h2>
                     <ul>
                         {unarchivedInvestments.value.map((asset) => (
                             <li key={asset.id}>
@@ -776,9 +806,7 @@ const Ledger = () => {
                                 name="investment_asset_fund_type"
                                 id="investment_asset_fund_type_element"
                             >
-                                {unarchivedFundTypes.value.filter((type) =>
-                                    !type.archived
-                                ).map((fund_type) => {
+                                {unarchivedFundTypes.value.map((fund_type) => {
                                     return (
                                         <option
                                             key={fund_type.id}
@@ -815,11 +843,240 @@ const Ledger = () => {
                             <input
                                 required
                                 type="number"
+                                min={Number.MIN_VALUE}
                                 name="investment_asset_current_bid"
                                 id="investment_asset_current_bid_element"
                                 step="any"
                             />
                         </label>
+                    </GenericForm>
+                </section>
+                <section>
+                    <h2>Investment Lots</h2>
+
+                    <form>
+                        <div>
+                            {unarchivedInvestmentLots.value.map((lot) => {
+                                return (
+                                    <label
+                                        key={lot.id}
+                                        htmlFor={`existing_lot_element_${lot.id}`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name={`existing_lot`}
+                                            id={`existing_lot_element_${lot.id}`}
+                                            value={lot.id}
+                                            checked={selectedLotId.value ===
+                                                lot.id}
+                                            onChange={(e) => {
+                                                selectedLotId.value = Number(
+                                                    e.currentTarget.value,
+                                                );
+                                            }}
+                                        />
+                                        {unarchivedInvestments.value.find((
+                                            a,
+                                        ) => a.id === lot.investment_id)
+                                            ?.name} -{" "}
+                                        {lot.remaining_quantity}/{lot
+                                            .initial_quantity}{" "}
+                                        unit ({formatIsoToDayMonth(
+                                            lot.purchased_at,
+                                        )}: {lot.unit_cost}/unit)
+                                    </label>
+                                );
+                            })}
+                        </div>
+                        <label htmlFor="existing_lot_quantity_element">
+                            Quantity to Sell
+                            <input
+                                required
+                                disabled={!Boolean(selectedLotId.value)}
+                                type="number"
+                                min={Number.MIN_VALUE}
+                                max={selectedLot.value
+                                    ?.remaining_quantity}
+                                step="any"
+                                name="existing_lot_quantity"
+                                id="existing_lot_quantity_element"
+                            />
+                        </label>
+                        <label htmlFor="existing_lot_current_price_element">
+                            Current Price
+                            <input
+                                required
+                                disabled={!Boolean(selectedLotId.value)}
+                                type="number"
+                                min={Number.MIN_VALUE}
+                                defaultValue={unarchivedInvestments
+                                    .value.find((
+                                        a,
+                                    ) => a.id ===
+                                        selectedLot.value?.investment_id
+                                    )?.current_bid}
+                                step="any"
+                                name="existing_lot_current_price"
+                                id="existing_lot_current_price_element"
+                            />
+                        </label>
+                        <label htmlFor="existing_lot_date_element">
+                            Sold at
+                            <input
+                                required
+                                disabled={!Boolean(selectedLotId.value)}
+                                type="datetime-local"
+                                name="existing_lot_date"
+                                id="existing_lot_date_element"
+                                defaultValue={new Date()
+                                    .toISOString()
+                                    .slice(0, 16)}
+                            />
+                        </label>
+                        <button
+                            type="submit"
+                            disabled={!Boolean(selectedLotId.value)}
+                        >
+                            Sell
+                        </button>
+                    </form>
+                    <GenericForm
+                        options={{
+                            formName: "investment_lot",
+                            onSubmit: handleSubmit,
+                        }}
+                    >
+                        <label htmlFor="lot_asset_element">
+                            Asset
+                            <select
+                                required
+                                name="lot_asset"
+                                id="lot_asset_element"
+                                value={String(selectedAssetId.value)}
+                                onChange={(e) => {
+                                    selectedAssetId.value = Number(
+                                        e.currentTarget.value,
+                                    );
+                                }}
+                            >
+                                {unarchivedInvestments.value.map(
+                                    (asset) => {
+                                        return (
+                                            <option
+                                                key={asset.id}
+                                                value={asset.id}
+                                            >
+                                                {asset.name}
+                                            </option>
+                                        );
+                                    },
+                                )}
+                            </select>
+                        </label>
+                        <label htmlFor="lot_quantity_element">
+                            Quantity
+                            <input
+                                required
+                                disabled={!Boolean(selectedAsset.value)}
+                                type="number"
+                                step="any"
+                                min={Number.MIN_VALUE}
+                                name="lot_quantity"
+                                id="lot_quantity_element"
+                            />
+                        </label>
+                        <label htmlFor="lot_current_price_element">
+                            Current Price {!selectedAsset.value
+                                ? ""
+                                : `(${selectedAsset.value.unit})`}
+                            <input
+                                required
+                                disabled={!Boolean(selectedAsset.value)}
+                                type="number"
+                                step="any"
+                                min={Number.MIN_VALUE}
+                                name="lot_current_price"
+                                id="lot_current_price_element"
+                                defaultValue={selectedAsset.value?.current_bid}
+                            />
+                        </label>
+                        <label htmlFor="lot_source_account_element">
+                            Source Account
+                            <select
+                                required
+                                disabled={!Boolean(selectedAsset.value)}
+                                name="lot_source_account"
+                                id="lot_source_account_element"
+                                value={String(selectedAccountId.value)}
+                                onChange={(e) => {
+                                    selectedAccountId.value = Number(
+                                        e.currentTarget.value,
+                                    );
+                                }}
+                            >
+                                {allAccounts.value.filter((a) => !a.archived &&
+                                    a.id !== INVESTMENT_ACCOUNT_ID
+                                )
+                                    .map(
+                                        (account) => {
+                                            return (
+                                                <option
+                                                    key={account.id}
+                                                    value={account.id}
+                                                >
+                                                    {account.name}
+                                                </option>
+                                            );
+                                        },
+                                    )}
+                            </select>
+                        </label>
+
+                        {/* TODO: Make asset in the Investment Lots only show asset that is not being held in lots */}
+                        {/* TODO: Only show unique assets in the Investment Lots preview. Show specific lots for one asset when focused */}
+
+                        {selectedAccountId.value &&
+                            (selectedAccountId.value === DEBT_ACCOUNT_ID ||
+                                selectedAccountId.value ===
+                                    RECEIVABLE_ACCOUNT_ID) &&
+                            (
+                                <label htmlFor="lot_source_contact_element">
+                                    Contact
+                                    <select
+                                        required
+                                        disabled={!Boolean(selectedAsset.value)}
+                                        name="lot_source_contact"
+                                        id="lot_source_contact_element"
+                                    >
+                                        {unarchivedContacts.value.map(
+                                            (contact) => {
+                                                return (
+                                                    <option
+                                                        key={contact.id}
+                                                        value={contact.id}
+                                                    >
+                                                        {contact.name}
+                                                    </option>
+                                                );
+                                            },
+                                        )}
+                                    </select>
+                                </label>
+                            )}
+
+                        {selectedAsset.value && (
+                            <p>
+                                Changing the current price will update the asset
+                                unit price.
+                            </p>
+                        )}
+
+                        {/* For refetch */}
+                        <input
+                            type="hidden"
+                            name="selected_date"
+                            value={selectedDate.value}
+                        />
                     </GenericForm>
                 </section>
             </main>
