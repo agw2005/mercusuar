@@ -53,6 +53,8 @@ import {
 import Layout from "#/components/Layout.tsx";
 import Categories from "./Categories/Categories";
 import Accounts from "./Accounts/Accounts";
+import Contacts from "./Contacts/Contacts";
+import FundTypes from "./FundTypes/FundTypes";
 
 const RECEIVABLE_ACCOUNT_ID = 1;
 const DEBT_ACCOUNT_ID = 2;
@@ -227,54 +229,8 @@ const Ledger = () => {
         <Layout name={`Ledger`}>
             <Categories />
             <Accounts />
-            <section>
-                <h2>Contacts</h2>
-                <ul>
-                    {unarchivedContacts.value.map((contact) => {
-                        return <li key={contact.id}>{contact.name}</li>;
-                    })}
-                </ul>
-                <GenericForm
-                    options={{
-                        formName: "contact",
-                        onSubmit: handleSubmit,
-                    }}
-                >
-                    <label htmlFor="contact_name_element">
-                        Name
-                        <input
-                            required
-                            type="text"
-                            name="contact_name"
-                            id="contact_name_element"
-                        />
-                    </label>
-                </GenericForm>
-            </section>
-            <section>
-                <h2>Fund Types</h2>
-                <ul>
-                    {unarchivedFundTypes.value.map((fund_type) => {
-                        return <li key={fund_type.id}>{fund_type.name}</li>;
-                    })}
-                </ul>
-                <GenericForm
-                    options={{
-                        formName: "fund_type",
-                        onSubmit: handleSubmit,
-                    }}
-                >
-                    <label htmlFor="fund_type_name_element">
-                        Name
-                        <input
-                            required
-                            type="text"
-                            name="fund_type_name"
-                            id="fund_type_name_element"
-                        />
-                    </label>
-                </GenericForm>
-            </section>
+            <Contacts />
+            <FundTypes />
             <section>
                 <h2>Transactions</h2>
                 <button
