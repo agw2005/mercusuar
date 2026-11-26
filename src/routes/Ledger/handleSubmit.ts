@@ -190,7 +190,9 @@ const handleSubmit = async (e: SubmitEvent) => {
             const newName =
                 formData.get("edit_category_new_name")?.toString().trim() ?? "";
 
-            const oldColor = "#000000";
+            const oldColor =
+                formData.get("edit_category_category_color")?.toString()
+                    .trim() ?? "";
             const newColor =
                 formData.get("edit_category_new_color")?.toString().trim() ??
                     "";
@@ -208,8 +210,11 @@ const handleSubmit = async (e: SubmitEvent) => {
             if (Object.keys(updates).length === 0) {
                 console.log("No changes detected.");
             } else {
-                const data = { categoryId, ...updates };
-                console.log(data);
+                const data = { id: categoryId, ...updates };
+
+                await categoriesQuery.patch(data);
+
+                await refetchAllCategories();
             }
 
             form.closest("dialog")?.close();

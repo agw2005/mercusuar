@@ -28,6 +28,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             ledger::categories::get_all_categories,
             ledger::categories::create_category,
+            ledger::categories::modify_category,
             ledger::accounts::get_all_accounts,
             ledger::accounts::balances_until_date,
             ledger::accounts::create_account,

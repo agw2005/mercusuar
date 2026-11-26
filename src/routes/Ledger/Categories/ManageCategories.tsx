@@ -85,7 +85,12 @@ const ManageCategories = () => {
                         />
                     </label>
 
-                    {/* Column color does not exist yet, I'll add it later */}
+                    <input
+                        type="hidden"
+                        value={focusedCategory.value?.color}
+                        name="edit_category_category_color"
+                    />
+
                     <label htmlFor="edit_category_new_color_element">
                         Color{" "}
                         <input

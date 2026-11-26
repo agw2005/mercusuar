@@ -17,4 +17,6 @@ export const categoriesQuery = {
         all: () => invoke<Categories[]>("get_all_categories"),
     },
     post: (name: string) => invoke<number>("create_category", { name }),
+    patch: (data: Partial<Pick<Categories, "name" | "color">>) =>
+        invoke("modify_category", { data }),
 };
