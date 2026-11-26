@@ -9,6 +9,7 @@ pub struct Account {
     pub name: String,
     pub archived: bool,
     pub is_system: bool,
+    pub color: String,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -17,6 +18,7 @@ pub struct AccountBalance {
     pub name: String,
     pub archived: bool,
     pub is_system: bool,
+    pub color: String,
     pub balance: f64,
 }
 
@@ -31,6 +33,7 @@ pub async fn balances_until_date(
             a.name,
             a.archived,
             a.is_system,
+            a.color,
             CAST(COALESCE(SUM(t.value), 0) AS REAL) AS balance
         FROM Accounts a
         LEFT JOIN Transactions t
@@ -54,7 +57,7 @@ pub async fn get_all_accounts(
     state: State<'_, DbState>,
 ) -> Result<Vec<Account>, String> {
     sqlx::query_as::<_, Account>(
-        "SELECT id, name, archived, is_system FROM Accounts",
+        "SELECT id, name, archived, is_system, color FROM Accounts",
     )
     .fetch_all(&state.pool)
     .await

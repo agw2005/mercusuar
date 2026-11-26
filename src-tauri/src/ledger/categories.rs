@@ -8,6 +8,7 @@ pub struct Category {
     pub id: i64,
     pub name: String,
     pub archived: bool,
+    pub color: String,
     pub is_system: bool,
 }
 
@@ -16,7 +17,7 @@ pub async fn get_all_categories(
     state: State<'_, DbState>,
 ) -> Result<Vec<Category>, String> {
     sqlx::query_as::<_, Category>(
-        "SELECT id, name, archived, is_system FROM Categories",
+        "SELECT id, name, archived, is_system, color FROM Categories",
     )
     .fetch_all(&state.pool)
     .await

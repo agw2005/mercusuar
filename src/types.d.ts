@@ -5,6 +5,7 @@ export interface Categories {
     name: string;
     archived: boolean;
     is_system: boolean;
+    color: string;
 }
 
 export interface Accounts {
@@ -12,18 +13,21 @@ export interface Accounts {
     name: string;
     archived: boolean;
     is_system: boolean;
+    color: string;
 }
 
 export interface Contacts {
     id: number;
     name: string;
     archived: boolean;
+    color: string;
 }
 
 export interface FundTypes {
     id: number;
     name: string;
     archived: boolean;
+    color: string;
 }
 
 export interface Transactions {

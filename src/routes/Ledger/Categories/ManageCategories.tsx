@@ -92,7 +92,7 @@ const ManageCategories = () => {
                             type="color"
                             name="edit_category_new_color"
                             id="edit_category_new_color_element"
-                            defaultValue={`#000000`}
+                            defaultValue={focusedCategory.value?.color}
                         />
                     </label>
 

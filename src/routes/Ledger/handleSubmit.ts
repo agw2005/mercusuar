@@ -15,7 +15,7 @@ import {
     fundTypesQuery,
     refetchUnarchivedFundTypes,
 } from "#/libs/store/fundType.ts";
-import type { AccountChange } from "#/types.d.ts";
+import type { AccountChange, Categories } from "#/types.d.ts";
 import {
     refetchTransactionsAtMonth,
     transactionsQuery,
@@ -172,54 +172,49 @@ const handleSubmit = async (e: SubmitEvent) => {
                 await refetchInvestments();
             }
             break;
-        case "edit_category":
-            {
-                const categoryId = Number(
-                    formData.get("edit_category_category_id"),
-                );
-                const isSave = Boolean(formData.get("edit_category_save"));
+        case "edit_category": {
+            const categoryId = Number(
+                formData.get("edit_category_category_id"),
+            );
+            const isSave = Boolean(formData.get("edit_category_save"));
 
-                if (!isSave) {
-                    console.log(`Delete category with ID ${categoryId}`);
-                }
-
-                const oldName = String(
-                    formData.get("edit_category_category_name"),
-                );
-                const newName = String(
-                    formData.get("edit_category_new_name"),
-                ) || oldName;
-
-                const oldColor = "#000000";
-                const newColor = String(
-                    formData.get("edit_category_new_color"),
-                ) || oldColor;
-
-                const nameNoChange = newName.trim() === oldName.trim();
-                const colorNoChange = oldColor === newColor;
-
-                if (isSave && nameNoChange) {
-                    console.error("Name did not change.");
-                }
-                if (isSave && colorNoChange) {
-                    console.error("Color did not change.");
-                }
-
-                if (isSave && (!nameNoChange || !colorNoChange)) {
-                    const data = {
-                        categoryId,
-                        oldName,
-                        newName,
-                        newColor,
-                        isSave,
-                    };
-
-                    console.log(data);
-                }
-
+            if (!isSave) {
+                console.log(`Delete category with ID ${categoryId}`);
                 form.closest("dialog")?.close();
+                break;
             }
+
+            const oldName =
+                formData.get("edit_category_category_name")?.toString()
+                    .trim() ?? "";
+            const newName =
+                formData.get("edit_category_new_name")?.toString().trim() ?? "";
+
+            const oldColor = "#000000";
+            const newColor =
+                formData.get("edit_category_new_color")?.toString().trim() ??
+                    "";
+
+            const updates: Partial<Pick<Categories, "name" | "color">> = {};
+
+            if (newName && newName !== oldName) {
+                updates.name = newName;
+            }
+
+            if (newColor && newColor !== oldColor) {
+                updates.color = newColor;
+            }
+
+            if (Object.keys(updates).length === 0) {
+                console.log("No changes detected.");
+            } else {
+                const data = { categoryId, ...updates };
+                console.log(data);
+            }
+
+            form.closest("dialog")?.close();
             break;
+        }
         default:
             console.error("No form of that name exists.");
     }

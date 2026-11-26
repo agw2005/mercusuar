@@ -8,6 +8,7 @@ pub struct FundType {
     pub id: i64,
     pub name: String,
     pub archived: bool,
+    pub color: String,
 }
 
 #[tauri::command]
@@ -15,7 +16,7 @@ pub async fn get_unarchived_fund_types(
     state: State<'_, DbState>,
 ) -> Result<Vec<FundType>, String> {
     sqlx::query_as::<_, FundType>(
-        "SELECT id, name, archived FROM Fund_Types WHERE archived = 0",
+        "SELECT id, name, archived, color FROM Fund_Types WHERE archived = 0",
     )
     .fetch_all(&state.pool)
     .await
