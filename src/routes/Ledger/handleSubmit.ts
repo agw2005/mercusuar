@@ -32,9 +32,15 @@ import {
 const TRANSFER_CATEGORY_ID = 1;
 
 const handleSubmit = async (e: SubmitEvent) => {
+    const submitter = e.submitter as
+        | HTMLButtonElement
+        | HTMLInputElement
+        | null;
+    if (submitter?.formMethod === "dialog") return;
+
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
+    const formData = new FormData(form, e.submitter);
     const formType = form.dataset.formType;
 
     switch (formType) {
@@ -164,6 +170,54 @@ const handleSubmit = async (e: SubmitEvent) => {
                 await refetchTransactionsAtMonth(month, year);
                 await refetchInvestmentLots();
                 await refetchInvestments();
+            }
+            break;
+        case "edit_category":
+            {
+                const categoryId = Number(
+                    formData.get("edit_category_category_id"),
+                );
+                const isSave = Boolean(formData.get("edit_category_save"));
+
+                if (!isSave) {
+                    console.log(`Delete category with ID ${categoryId}`);
+                }
+
+                const oldName = String(
+                    formData.get("edit_category_category_name"),
+                );
+                const newName = String(
+                    formData.get("edit_category_new_name"),
+                ) || oldName;
+
+                const oldColor = "#000000";
+                const newColor = String(
+                    formData.get("edit_category_new_color"),
+                ) || oldColor;
+
+                const nameNoChange = newName.trim() === oldName.trim();
+                const colorNoChange = oldColor === newColor;
+
+                if (isSave && nameNoChange) {
+                    console.error("Name did not change.");
+                }
+                if (isSave && colorNoChange) {
+                    console.error("Color did not change.");
+                }
+
+                if (isSave && (!nameNoChange || !colorNoChange)) {
+                    const data = {
+                        categoryId,
+                        oldName,
+                        newName,
+                        newColor,
+                        isSave,
+                    };
+
+                    console.log(data);
+                }
+
+                form.closest("dialog")?.close();
             }
             break;
         default:
