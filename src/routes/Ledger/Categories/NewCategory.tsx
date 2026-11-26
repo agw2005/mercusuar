@@ -1,7 +1,7 @@
 import GenericForm from "#/components/GenericForm.tsx";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
-const NewCategories = () => {
+const NewCategory = () => {
     return (
         <>
             <h3>New Category</h3>
@@ -25,4 +25,4 @@ const NewCategories = () => {
     );
 };
 
-export default NewCategories;
+export default NewCategory;

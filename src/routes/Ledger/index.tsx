@@ -52,6 +52,7 @@ import {
 } from "#/libs/store/investmentLots.ts";
 import Layout from "#/components/Layout.tsx";
 import Categories from "./Categories/Categories";
+import Accounts from "./Accounts/Accounts";
 
 const RECEIVABLE_ACCOUNT_ID = 1;
 const DEBT_ACCOUNT_ID = 2;
@@ -225,30 +226,7 @@ const Ledger = () => {
     return (
         <Layout name={`Ledger`}>
             <Categories />
-            <section>
-                <h2>Accounts</h2>
-                <ul>
-                    {allAccounts.value.map((account) => {
-                        return <li key={account.id}>{account.name}</li>;
-                    })}
-                </ul>
-                <GenericForm
-                    options={{
-                        formName: "account",
-                        onSubmit: handleSubmit,
-                    }}
-                >
-                    <label htmlFor="account_name_element">
-                        Name
-                        <input
-                            required
-                            type="text"
-                            name="account_name"
-                            id="account_name_element"
-                        />
-                    </label>
-                </GenericForm>
-            </section>
+            <Accounts />
             <section>
                 <h2>Contacts</h2>
                 <ul>
