@@ -47,8 +47,8 @@ import {
     unarchivedInvestments,
 } from "#/libs/store/investments.ts";
 import {
+    allHeldLots,
     refetchInvestmentLots,
-    unarchivedInvestmentLots,
 } from "#/libs/store/investmentLots.ts";
 
 const RECEIVABLE_ACCOUNT_ID = 1;
@@ -62,21 +62,22 @@ const Ledger = () => {
     }]);
 
     const selectedDate = useSignal(dateToYearMonth(new Date()));
-    const selectedAssetId = useSignal<number | null>(null);
+    const newLotSelectedAssetId = useSignal<number | null>(null);
     const selectedAccountId = useSignal<number | null>(null);
-    const selectedLotId = useSignal<number | null>(null);
+    const existingLotSelectedAssetId = useSignal<number | null>(null);
+    const existingLotSelectedLotId = useSignal<number | null>(null);
 
-    const selectedAsset = useComputed<Investments | null>(() => {
-        const id = selectedAssetId.value;
+    const newLotselectedAsset = useComputed<Investments | null>(() => {
+        const id = newLotSelectedAssetId.value;
         if (!id) return null;
         return unarchivedInvestments.value.find((asset) => asset.id === id) ||
             null;
     });
 
-    const selectedLot = useComputed<Investment_Lots | null>(() => {
-        const id = selectedLotId.value;
+    const existingLotSelectedAsset = useComputed<Investment_Lots | null>(() => {
+        const id = existingLotSelectedAssetId.value;
         if (!id) return null;
-        return unarchivedInvestmentLots.value.find((l) => l.id === id) ||
+        return allHeldLots.value.find((l) => l.id === id) ||
             null;
     });
 
@@ -854,92 +855,156 @@ const Ledger = () => {
                 <section>
                     <h2>Investment Lots</h2>
 
+                    <h3>Manage Lots</h3>
                     <form>
-                        <div>
-                            {unarchivedInvestmentLots.value.map((lot) => {
-                                return (
+                        {unarchivedInvestments.value.map((asset) => {
+                            return (
+                                <div key={asset.id}>
                                     <label
-                                        key={lot.id}
-                                        htmlFor={`existing_lot_element_${lot.id}`}
+                                        htmlFor={`existing_lot_asset_id_${asset.id}_element`}
                                     >
                                         <input
                                             type="radio"
-                                            name={`existing_lot`}
-                                            id={`existing_lot_element_${lot.id}`}
-                                            value={lot.id}
-                                            checked={selectedLotId.value ===
-                                                lot.id}
+                                            name={`existing_lot_asset_id`}
+                                            id={`existing_lot_asset_id_${asset.id}_element`}
+                                            value={asset.id}
+                                            checked={existingLotSelectedAssetId
+                                                .value ===
+                                                asset.id}
                                             onChange={(e) => {
-                                                selectedLotId.value = Number(
-                                                    e.currentTarget.value,
-                                                );
+                                                existingLotSelectedAssetId
+                                                    .value = Number(
+                                                        e.currentTarget
+                                                            .value,
+                                                    );
                                             }}
                                         />
-                                        {unarchivedInvestments.value.find((
-                                            a,
-                                        ) => a.id === lot.investment_id)
-                                            ?.name} -{" "}
-                                        {lot.remaining_quantity}/{lot
-                                            .initial_quantity}{" "}
-                                        unit ({formatIsoToDayMonth(
-                                            lot.purchased_at,
-                                        )}: {lot.unit_cost}/unit)
+                                        {asset.name}
                                     </label>
-                                );
-                            })}
-                        </div>
-                        <label htmlFor="existing_lot_quantity_element">
-                            Quantity to Sell
-                            <input
-                                required
-                                disabled={!Boolean(selectedLotId.value)}
-                                type="number"
-                                min={Number.MIN_VALUE}
-                                max={selectedLot.value
-                                    ?.remaining_quantity}
-                                step="any"
-                                name="existing_lot_quantity"
-                                id="existing_lot_quantity_element"
-                            />
-                        </label>
-                        <label htmlFor="existing_lot_current_price_element">
-                            Current Price
-                            <input
-                                required
-                                disabled={!Boolean(selectedLotId.value)}
-                                type="number"
-                                min={Number.MIN_VALUE}
-                                defaultValue={unarchivedInvestments
-                                    .value.find((
-                                        a,
-                                    ) => a.id ===
-                                        selectedLot.value?.investment_id
-                                    )?.current_bid}
-                                step="any"
-                                name="existing_lot_current_price"
-                                id="existing_lot_current_price_element"
-                            />
-                        </label>
-                        <label htmlFor="existing_lot_date_element">
-                            Sold at
-                            <input
-                                required
-                                disabled={!Boolean(selectedLotId.value)}
-                                type="datetime-local"
-                                name="existing_lot_date"
-                                id="existing_lot_date_element"
-                                defaultValue={new Date()
-                                    .toISOString()
-                                    .slice(0, 16)}
-                            />
-                        </label>
-                        <button
-                            type="submit"
-                            disabled={!Boolean(selectedLotId.value)}
-                        >
-                            Sell
-                        </button>
+                                    {existingLotSelectedAssetId.value ===
+                                            asset.id &&
+                                        (
+                                            <>
+                                                {allHeldLots.value.filter((
+                                                    lot,
+                                                ) => lot.investment_id ===
+                                                    asset.id
+                                                ).map((lot) => {
+                                                    return (
+                                                        <div key={lot.id}>
+                                                            <label
+                                                                htmlFor={`existing_lot_id_${lot.id}_element`}
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`existing_lot_id_${lot.id}`}
+                                                                    id={`existing_lot_id_${lot.id}_element`}
+                                                                    value={lot
+                                                                        .id}
+                                                                    checked={existingLotSelectedLotId
+                                                                        .value ===
+                                                                        lot.id}
+                                                                    onChange={(
+                                                                        e,
+                                                                    ) => {
+                                                                        existingLotSelectedLotId
+                                                                            .value =
+                                                                                Number(
+                                                                                    e.currentTarget
+                                                                                        .value,
+                                                                                );
+                                                                    }}
+                                                                />
+                                                                {lot.remaining_quantity}/{lot
+                                                                    .initial_quantity}
+                                                                {" "}
+                                                                unit
+                                                                [{formatIsoToDayMonth(
+                                                                    lot.purchased_at,
+                                                                )}:{" "}
+                                                                {lot.unit_cost}/unit]
+                                                            </label>
+                                                        </div>
+                                                    );
+                                                })}
+                                                <div>
+                                                    <label htmlFor="existing_lot_quantity_element">
+                                                        Quantity to Sell
+                                                        <input
+                                                            required
+                                                            disabled={!Boolean(
+                                                                existingLotSelectedAssetId
+                                                                    .value,
+                                                            )}
+                                                            type="number"
+                                                            min={Number
+                                                                .MIN_VALUE}
+                                                            max={existingLotSelectedAsset
+                                                                .value
+                                                                ?.remaining_quantity}
+                                                            step="any"
+                                                            name="existing_lot_quantity"
+                                                            id="existing_lot_quantity_element"
+                                                        />
+                                                    </label>
+                                                    <label htmlFor="existing_lot_current_price_element">
+                                                        Current Price
+                                                        <input
+                                                            required
+                                                            disabled={!Boolean(
+                                                                existingLotSelectedAssetId
+                                                                    .value,
+                                                            )}
+                                                            type="number"
+                                                            min={Number
+                                                                .MIN_VALUE}
+                                                            defaultValue={unarchivedInvestments
+                                                                .value.find((
+                                                                    a,
+                                                                ) => a.id ===
+                                                                    existingLotSelectedAsset
+                                                                        .value
+                                                                        ?.investment_id
+                                                                )?.current_bid}
+                                                            step="any"
+                                                            name="existing_lot_current_price"
+                                                            id="existing_lot_current_price_element"
+                                                        />
+                                                    </label>
+                                                    <label htmlFor="existing_lot_date_element">
+                                                        Sold at
+                                                        <input
+                                                            required
+                                                            disabled={!Boolean(
+                                                                existingLotSelectedAssetId
+                                                                    .value,
+                                                            )}
+                                                            type="datetime-local"
+                                                            name="existing_lot_date"
+                                                            id="existing_lot_date_element"
+                                                            defaultValue={new Date()
+                                                                .toISOString()
+                                                                .slice(0, 16)}
+                                                        />
+                                                    </label>
+                                                    <button
+                                                        type="submit"
+                                                        disabled={!Boolean(
+                                                            existingLotSelectedAssetId
+                                                                .value,
+                                                        )}
+                                                    >
+                                                        Sell
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                </div>
+                            );
+                        })}
                     </form>
+
+                    <h3>New Lot</h3>
                     <GenericForm
                         options={{
                             formName: "investment_lot",
@@ -952,9 +1017,9 @@ const Ledger = () => {
                                 required
                                 name="lot_asset"
                                 id="lot_asset_element"
-                                value={String(selectedAssetId.value)}
+                                value={String(newLotSelectedAssetId.value)}
                                 onChange={(e) => {
-                                    selectedAssetId.value = Number(
+                                    newLotSelectedAssetId.value = Number(
                                         e.currentTarget.value,
                                     );
                                 }}
@@ -977,7 +1042,7 @@ const Ledger = () => {
                             Quantity
                             <input
                                 required
-                                disabled={!Boolean(selectedAsset.value)}
+                                disabled={!Boolean(newLotselectedAsset.value)}
                                 type="number"
                                 step="any"
                                 min={Number.MIN_VALUE}
@@ -986,25 +1051,26 @@ const Ledger = () => {
                             />
                         </label>
                         <label htmlFor="lot_current_price_element">
-                            Current Price {!selectedAsset.value
+                            Current Price {!newLotselectedAsset.value
                                 ? ""
-                                : `(${selectedAsset.value.unit})`}
+                                : `(${newLotselectedAsset.value.unit})`}
                             <input
                                 required
-                                disabled={!Boolean(selectedAsset.value)}
+                                disabled={!Boolean(newLotselectedAsset.value)}
                                 type="number"
                                 step="any"
                                 min={Number.MIN_VALUE}
                                 name="lot_current_price"
                                 id="lot_current_price_element"
-                                defaultValue={selectedAsset.value?.current_bid}
+                                defaultValue={newLotselectedAsset.value
+                                    ?.current_bid}
                             />
                         </label>
                         <label htmlFor="lot_source_account_element">
                             Source Account
                             <select
                                 required
-                                disabled={!Boolean(selectedAsset.value)}
+                                disabled={!Boolean(newLotselectedAsset.value)}
                                 name="lot_source_account"
                                 id="lot_source_account_element"
                                 value={String(selectedAccountId.value)}
@@ -1014,7 +1080,8 @@ const Ledger = () => {
                                     );
                                 }}
                             >
-                                {allAccounts.value.filter((a) => !a.archived &&
+                                {allAccounts.value.filter((a) =>
+                                    !a.archived &&
                                     a.id !== INVESTMENT_ACCOUNT_ID
                                 )
                                     .map(
@@ -1032,7 +1099,6 @@ const Ledger = () => {
                             </select>
                         </label>
 
-                        {/* TODO: Make asset in the Investment Lots only show asset that is not being held in lots */}
                         {/* TODO: Only show unique assets in the Investment Lots preview. Show specific lots for one asset when focused */}
 
                         {selectedAccountId.value &&
@@ -1044,7 +1110,9 @@ const Ledger = () => {
                                     Contact
                                     <select
                                         required
-                                        disabled={!Boolean(selectedAsset.value)}
+                                        disabled={!Boolean(
+                                            newLotselectedAsset.value,
+                                        )}
                                         name="lot_source_contact"
                                         id="lot_source_contact_element"
                                     >
@@ -1064,7 +1132,7 @@ const Ledger = () => {
                                 </label>
                             )}
 
-                        {selectedAsset.value && (
+                        {newLotselectedAsset.value && (
                             <p>
                                 Changing the current price will update the asset
                                 unit price.

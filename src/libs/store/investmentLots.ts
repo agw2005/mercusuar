@@ -2,11 +2,11 @@ import { signal } from "@preact/signals";
 import type { Investment_Lots } from "#/types.d.ts";
 import { invoke } from "@tauri-apps/api/core";
 
-export const unarchivedInvestmentLots = signal<Investment_Lots[]>([]);
+export const allHeldLots = signal<Investment_Lots[]>([]);
 
 export const refetchInvestmentLots = async () => {
     try {
-        unarchivedInvestmentLots.value = await investmentLotsQuery.get
+        allHeldLots.value = await investmentLotsQuery.get
             .all();
     } catch (error) {
         console.error("Failed to fetch all investment lots:", error);
