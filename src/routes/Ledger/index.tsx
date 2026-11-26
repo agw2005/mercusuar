@@ -8,10 +8,7 @@ import {
     refetchUnarchivedContacts,
     unarchivedContacts,
 } from "#/libs/store/contacts.ts";
-import {
-    refetchUnarchivedFundTypes,
-    unarchivedFundTypes,
-} from "#/libs/store/fundType.ts";
+import { refetchUnarchivedFundTypes } from "#/libs/store/fundType.ts";
 import type { Investment_Lots, Investments } from "#/types.d.ts";
 import { formatIsoToDayMonth } from "#/libs/ISOToDateMonth.ts";
 import {
@@ -30,6 +27,7 @@ import FundTypes from "./FundTypes/FundTypes";
 import Transactions from "./Transactions/Transactions";
 import { ACCOUNT } from "#/libs/systemsId.ts";
 import { selectedDate } from "./selectedDate";
+import InvestmentsSection from "./Investments/Investments";
 
 const Ledger = () => {
     const newLotSelectedAssetId = useSignal<number | null>(null);
@@ -67,76 +65,7 @@ const Ledger = () => {
             <Contacts />
             <FundTypes />
             <Transactions />
-            <section>
-                <h2>Investment Assets</h2>
-                <ul>
-                    {unarchivedInvestments.value.map((asset) => (
-                        <li key={asset.id}>
-                            {asset.name}{" "}
-                            ({unarchivedFundTypes.value.find((fundType) =>
-                                fundType.id === asset.fund_type_id
-                            )?.name}) [{formatIsoToDayMonth(
-                                asset.last_updated,
-                            )}: {asset.unit} = {asset.current_bid}]
-                        </li>
-                    ))}
-                </ul>
-                <GenericForm
-                    options={{
-                        formName: "investment_asset",
-                        onSubmit: handleSubmit,
-                    }}
-                >
-                    <label htmlFor="investment_asset_fund_type_element">
-                        Fund Type
-                        <select
-                            name="investment_asset_fund_type"
-                            id="investment_asset_fund_type_element"
-                        >
-                            {unarchivedFundTypes.value.map((fund_type) => {
-                                return (
-                                    <option
-                                        key={fund_type.id}
-                                        value={fund_type.id}
-                                    >
-                                        {fund_type.name}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </label>
-                    <label htmlFor="investment_asset_name_element">
-                        Name
-                        <input
-                            required
-                            type="text"
-                            name="investment_asset_name"
-                            id="investment_asset_name_element"
-                        />
-                    </label>
-                    <label htmlFor="investment_asset_unit_element">
-                        Unit
-                        <input
-                            required
-                            type="text"
-                            name="investment_asset_unit"
-                            id="investment_asset_unit_element"
-                            placeholder="Ex: 1 mBTC"
-                        />
-                    </label>
-                    <label htmlFor="investment_asset_current_bid_element">
-                        Current Bid Price
-                        <input
-                            required
-                            type="number"
-                            min={Number.MIN_VALUE}
-                            name="investment_asset_current_bid"
-                            id="investment_asset_current_bid_element"
-                            step="any"
-                        />
-                    </label>
-                </GenericForm>
-            </section>
+            <InvestmentsSection />
             <section>
                 <h2>Investment Lots</h2>
                 <h3>Manage Lots</h3>
@@ -381,7 +310,6 @@ const Ledger = () => {
                                 )}
                         </select>
                     </label>
-                    {/* TODO: Only show unique assets in the Investment Lots preview. Show specific lots for one asset when focused */}
                     {selectedAccountId.value &&
                         (selectedAccountId.value === ACCOUNT.DEBT ||
                             selectedAccountId.value ===
