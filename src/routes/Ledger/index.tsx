@@ -51,6 +51,7 @@ import {
     refetchInvestmentLots,
 } from "#/libs/store/investmentLots.ts";
 import Layout from "#/components/Layout.tsx";
+import Categories from "./Categories/Categories";
 
 const RECEIVABLE_ACCOUNT_ID = 1;
 const DEBT_ACCOUNT_ID = 2;
@@ -223,30 +224,7 @@ const Ledger = () => {
 
     return (
         <Layout name={`Ledger`}>
-            <section>
-                <h2>Categories</h2>
-                <ul>
-                    {allCategories.value.map((category) => {
-                        return <li key={category.id}>{category.name}</li>;
-                    })}
-                </ul>
-                <GenericForm
-                    options={{
-                        formName: "category",
-                        onSubmit: handleSubmit,
-                    }}
-                >
-                    <label htmlFor="category_name_element">
-                        Name
-                        <input
-                            required
-                            type="text"
-                            name="category_name"
-                            id="category_name_element"
-                        />
-                    </label>
-                </GenericForm>
-            </section>
+            <Categories />
             <section>
                 <h2>Accounts</h2>
                 <ul>
