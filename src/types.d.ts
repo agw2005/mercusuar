@@ -105,3 +105,15 @@ export interface TransactionByTime {
 export interface AccountBalance extends Accounts {
     balance: number;
 }
+
+export interface AccountEntry {
+    accountId: number;
+    value: string;
+}
+
+export interface TransactionsAtDay {
+    dayLabel: string;
+    transactions: TransactionByTime[];
+    endOfDayBalances: Record<number, number>;
+    endOfDayEquity: number;
+}
