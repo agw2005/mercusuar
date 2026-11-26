@@ -82,3 +82,20 @@ pub async fn modify_category(
 
     Ok(result.rows_affected())
 }
+
+#[tauri::command]
+pub async fn delete_category(
+    state: State<'_, DbState>,
+    id: i64,
+) -> Result<u64, String> {
+    let result = sqlx::query(
+        "DELETE FROM Categories
+         WHERE id = (?)",
+    )
+    .bind(id)
+    .execute(&state.pool)
+    .await
+    .map_err(|e| format!("Failed to delete category: {e}"))?;
+
+    Ok(result.rows_affected())
+}

@@ -14,7 +14,9 @@ const ManageCategories = () => {
             <h3>Manage Categories</h3>
             <ul>
                 {allCategories.value
-                    .filter((category) => !category.is_system)
+                    .filter((category) =>
+                        !category.is_system && !category.archived
+                    )
                     .map((category) => (
                         <li key={category.id}>
                             <button

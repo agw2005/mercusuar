@@ -29,17 +29,19 @@ const NewTransactions = () => {
                         name="transaction_category"
                         id="transaction_category_element"
                     >
-                        {allCategories.value.map((category) => {
-                            if (category.is_system) return void 0;
-                            return (
-                                <option
-                                    key={category.id}
-                                    value={category.id}
-                                >
-                                    {category.name}
-                                </option>
-                            );
-                        })}
+                        {allCategories.value
+                            .filter((category) => !category.archived)
+                            .map((category) => {
+                                if (category.is_system) return void 0;
+                                return (
+                                    <option
+                                        key={category.id}
+                                        value={category.id}
+                                    >
+                                        {category.name}
+                                    </option>
+                                );
+                            })}
                     </select>
                     if the equity change is 0, the category will be "Transfer"
                     automatically.

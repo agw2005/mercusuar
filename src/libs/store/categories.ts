@@ -19,4 +19,5 @@ export const categoriesQuery = {
     post: (name: string) => invoke<number>("create_category", { name }),
     patch: (data: Partial<Pick<Categories, "name" | "color">>) =>
         invoke("modify_category", { data }),
+    delete: (id: number) => invoke("delete_category", { id }),
 };

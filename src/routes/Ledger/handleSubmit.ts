@@ -179,7 +179,8 @@ const handleSubmit = async (e: SubmitEvent) => {
             const isSave = Boolean(formData.get("edit_category_save"));
 
             if (!isSave) {
-                console.log(`Delete category with ID ${categoryId}`);
+                if (categoryId) await categoriesQuery.delete(categoryId);
+                await refetchAllCategories();
                 form.closest("dialog")?.close();
                 break;
             }
