@@ -6,13 +6,34 @@ interface LayoutProps {
 }
 
 const Layout = ({ name, children }: LayoutProps) => {
+    const routes: { title: string; url: string }[] = [
+        {
+            title: "Home",
+            url: "/",
+        },
+        {
+            title: "Ledger",
+            url: "/ledger",
+        },
+        {
+            title: "Habit",
+            url: "/habit",
+        },
+        {
+            title: "Health",
+            url: "/health",
+        },
+    ];
+
     return (
         <>
             <header>
                 <h1>{name}</h1>
-                <a href="/">Home</a>
-                <a href="/habit">Habit</a>
-                <a href="/health">Health</a>
+                {routes.filter((route) =>
+                    route.url !== globalThis.location.pathname
+                ).map((route) => (
+                    <a key={route.url} href={route.url}>{route.title}</a>
+                ))}
             </header>
             <main>
                 {children}
