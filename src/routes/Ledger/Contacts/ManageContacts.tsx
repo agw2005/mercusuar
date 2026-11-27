@@ -1,10 +1,12 @@
 import { allClaims, unarchivedContacts } from "#/libs/store/contacts.ts";
 import type { Contacts } from "#/types.d.ts";
-import { useSignal } from "@preact/signals";
+import { useComputed, useSignal } from "@preact/signals";
 import { useRef } from "preact/hooks";
 import { closeModalOutsideBox } from "#/libs/closeModalOutsideBox.ts";
 import ClaimsTable from "./ClaimsTable";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
+import { allAccounts } from "#/libs/store/accounts.ts";
+import { ACCOUNT } from "#/libs/systemsId.ts";
 
 const ManageContacts = () => {
     const modalContact = useSignal<Contacts | null>(null);
@@ -12,6 +14,26 @@ const ManageContacts = () => {
 
     const modal = useRef<HTMLDialogElement>(null);
     const editForm = useRef<HTMLFormElement>(null);
+    const deleteForm = useRef<HTMLFormElement>(null);
+
+    const modalTotalObligation = useComputed(() => {
+        return allClaims.value
+            .filter((claim) => claim.contact_id === modalContact.value?.id)
+            .reduce((acc, curr) => {
+                return curr.claim_type === "r"
+                    ? acc + curr.value
+                    : acc - curr.value;
+            }, 0);
+    });
+
+    const validDestinationAccounts = useComputed(() =>
+        allAccounts.value.filter((account) =>
+            !account.archived &&
+            account.id !== ACCOUNT.INVESTMENT &&
+            account.id !== ACCOUNT.DEBT &&
+            account.id !== ACCOUNT.RECEIVABLE
+        )
+    );
 
     return (
         <>
@@ -130,6 +152,58 @@ const ManageContacts = () => {
                     </label>
 
                     <button type="submit">Save</button>
+                </form>
+
+                <hr />
+
+                <form
+                    ref={deleteForm}
+                    data-form-type="delete_contact"
+                    onSubmit={handleSubmit}
+                >
+                    <h4>Delete Contact</h4>
+
+                    <input
+                        type="hidden"
+                        value={modalContact.value?.id}
+                        name="delete_contact_id"
+                    />
+
+                    {modalTotalObligation.value !== 0 && (
+                        <>
+                            <p>
+                                {modalTotalObligation.value > 0
+                                    ? `They owe you`
+                                    : `You owe them`}{" "}
+                                {Math.abs(modalTotalObligation.value)},{" "}
+                                which changes your equity by{" "}
+                                {modalTotalObligation.value}.<br />Pick a
+                                destination account to transfer the change to.
+                            </p>
+
+                            <label htmlFor="delete_contact_destination_element">
+                                Destination Account{" "}
+                                <select
+                                    required
+                                    name="delete_contact_destination_account"
+                                    id="delete_contact_destination_element"
+                                >
+                                    {validDestinationAccounts.value.map(
+                                        (account) => (
+                                            <option
+                                                key={account.id}
+                                                value={account.id}
+                                            >
+                                                {account.name}
+                                            </option>
+                                        ),
+                                    )}
+                                </select>
+                            </label>
+                        </>
+                    )}
+
+                    <button type="submit">Delete Contact</button>
                 </form>
 
                 <hr />

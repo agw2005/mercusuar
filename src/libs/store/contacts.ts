@@ -29,4 +29,9 @@ export const contactsQuery = {
     post: (name: string) => invoke<number>("create_contact", { name }),
     patch: (data: Partial<Pick<Contacts, "name" | "color">>) =>
         invoke("modify_contact", { data }),
+    delete: (data: {
+        id: number;
+        destinationAccountId: number | null;
+        date: string;
+    }) => invoke<number>("delete_contact", { data }),
 };

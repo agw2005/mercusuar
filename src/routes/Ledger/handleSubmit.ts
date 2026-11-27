@@ -326,6 +326,25 @@ const handleSubmit = async (e: SubmitEvent) => {
             form.closest("dialog")?.close();
             break;
         }
+        case "delete_contact": {
+            const id = Number(formData.get("delete_contact_id"));
+            const rawDest = formData.get("delete_contact_destination_account");
+
+            await contactsQuery.delete({
+                id,
+                destinationAccountId: rawDest === null ? null : Number(rawDest),
+                date: new Date().toISOString(),
+            });
+
+            const [year, month] = selectedDate.value.split("-").map(Number);
+            await refetchTransactionsAtMonth(month, year);
+            await refetchBalances(month, year);
+            await refetchClaims();
+            await refetchUnarchivedContacts();
+
+            form.closest("dialog")?.close();
+            break;
+        }
         default:
             console.error("No form of that name exists.");
     }

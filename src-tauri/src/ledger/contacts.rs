@@ -3,6 +3,11 @@ use tauri::State;
 
 use crate::db::DbState;
 
+const CATEGORY_TRANSFER: i64 = 1;
+const ACCOUNT_RECEIVABLE: i64 = 1;
+const ACCOUNT_DEBT: i64 = 2;
+const ACCOUNT_INVESTMENT: i64 = 3;
+
 #[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct Contact {
     pub id: i64,
@@ -13,7 +18,6 @@ pub struct Contact {
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct Claim {
-    #[serde(rename = "type")]
     pub claim_type: String,
     pub id: i64,
     pub transaction_id: i64,
@@ -29,6 +33,21 @@ pub struct UpdateContact {
     pub id: i64,
     pub name: Option<String>,
     pub color: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteContactPayload {
+    pub id: i64,
+    pub destination_account_id: Option<i64>,
+    pub date: String,
+}
+
+#[derive(sqlx::FromRow)]
+struct ContactCloseSnapshot {
+    name: String,
+    receivable_total: f64,
+    debt_total: f64,
 }
 
 #[tauri::command]
@@ -131,6 +150,133 @@ pub async fn modify_contact(
     .execute(&state.pool)
     .await
     .map_err(|e| format!("Failed to modify contact: {e}"))?;
+
+    Ok(result.rows_affected())
+}
+
+#[tauri::command]
+pub async fn delete_contact(
+    state: State<'_, DbState>,
+    data: DeleteContactPayload,
+) -> Result<u64, String> {
+    let mut tx = state
+        .pool
+        .begin()
+        .await
+        .map_err(|e| format!("Failed to start transaction: {e}"))?;
+
+    let contact = sqlx::query_as::<_, ContactCloseSnapshot>(
+        "SELECT
+            c.name,
+            CAST(COALESCE((
+                SELECT SUM(t.value)
+                FROM Receivables r
+                INNER JOIN Transactions t ON r.transaction_id = t.id
+                WHERE r.contact_id = c.id
+            ), 0) AS REAL) AS receivable_total,
+            CAST(COALESCE((
+                SELECT SUM(t.value)
+                FROM Debts d
+                INNER JOIN Transactions t ON d.transaction_id = t.id
+                WHERE d.contact_id = c.id
+            ), 0) AS REAL) AS debt_total
+         FROM Contacts c
+         WHERE c.id = ?",
+    )
+    .bind(data.id)
+    .fetch_optional(&mut *tx)
+    .await
+    .map_err(|e| format!("Failed to fetch contact snapshot: {e}"))?
+    .ok_or_else(|| format!("Contact {} not found", data.id))?;
+
+    let net_transfer = contact.receivable_total - contact.debt_total;
+    let description = format!("Settle and close contact {}", contact.name);
+
+    let dest_id = if net_transfer.abs() > f64::EPSILON {
+        let id = data
+            .destination_account_id
+            .ok_or_else(|| "Destination account is required for non-zero obligation".to_string())?;
+
+        if id == ACCOUNT_INVESTMENT || id == ACCOUNT_DEBT || id == ACCOUNT_RECEIVABLE {
+            return Err(
+                "Destination account must not be a systems default".to_string(),
+            );
+        }
+        Some(id)
+    } else {
+        None
+    };
+
+    if contact.receivable_total.abs() > f64::EPSILON {
+        let rec_tx_id = sqlx::query(
+            "INSERT INTO Transactions (category_id, account_id, value, description, date)
+             VALUES (?, ?, ?, ?, ?)",
+        )
+        .bind(CATEGORY_TRANSFER)
+        .bind(ACCOUNT_RECEIVABLE)
+        .bind(-contact.receivable_total)
+        .bind(&description)
+        .bind(&data.date)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Failed to insert receivable settlement transaction: {e}"))?
+        .last_insert_rowid();
+
+        sqlx::query("INSERT INTO Receivables (transaction_id, contact_id) VALUES (?, ?)")
+            .bind(rec_tx_id)
+            .bind(data.id)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| format!("Failed to link receivable settlement: {e}"))?;
+    }
+
+    if contact.debt_total.abs() > f64::EPSILON {
+        let debt_tx_id = sqlx::query(
+            "INSERT INTO Transactions (category_id, account_id, value, description, date)
+             VALUES (?, ?, ?, ?, ?)",
+        )
+        .bind(CATEGORY_TRANSFER)
+        .bind(ACCOUNT_DEBT)
+        .bind(-contact.debt_total)
+        .bind(&description)
+        .bind(&data.date)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Failed to insert debt settlement transaction: {e}"))?
+        .last_insert_rowid();
+
+        sqlx::query("INSERT INTO Debts (transaction_id, contact_id) VALUES (?, ?)")
+            .bind(debt_tx_id)
+            .bind(data.id)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| format!("Failed to link debt settlement: {e}"))?;
+    }
+
+    if let Some(dest_account_id) = dest_id {
+        sqlx::query(
+            "INSERT INTO Transactions (category_id, account_id, value, description, date)
+             VALUES (?, ?, ?, ?, ?)",
+        )
+        .bind(CATEGORY_TRANSFER)
+        .bind(dest_account_id)
+        .bind(net_transfer)
+        .bind(&description)
+        .bind(&data.date)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Failed to insert destination settlement transaction: {e}"))?;
+    }
+
+    let result = sqlx::query("DELETE FROM Contacts WHERE id = ?")
+        .bind(data.id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Failed to delete contact: {e}"))?;
+
+    tx.commit()
+        .await
+        .map_err(|e| format!("Failed to commit contact deletion: {e}"))?;
 
     Ok(result.rows_affected())
 }

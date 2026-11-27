@@ -40,6 +40,7 @@ pub fn run() {
             ledger::contacts::create_contact,
             ledger::contacts::get_all_claims,
             ledger::contacts::modify_contact,
+            ledger::contacts::delete_contact,
             ledger::fund_types::get_unarchived_fund_types,
             ledger::fund_types::create_fund_type,
             ledger::transactions::get_transactions_at_month,
