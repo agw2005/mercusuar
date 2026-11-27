@@ -121,3 +121,13 @@ export interface TransactionsAtDay {
     endOfDayBalances: Record<number, number>;
     endOfDayEquity: number;
 }
+
+export interface Claim {
+    id: number;
+    transaction_id: number;
+    contact_id: number;
+    name: string;
+    date: string;
+    description: string;
+    value: number;
+}

@@ -4,7 +4,7 @@ import NewContact from "./NewContact";
 const Contacts = () => {
     return (
         <>
-            <h2>Accounts</h2>
+            <h2>Contacts</h2>
             <ManageContacts />
             <NewContact />
         </>
