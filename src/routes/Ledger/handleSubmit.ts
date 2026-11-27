@@ -28,8 +28,8 @@ import {
     investmentLotsQuery,
     refetchInvestmentLots,
 } from "#/libs/store/investmentLots.ts";
-
-const TRANSFER_CATEGORY_ID = 1;
+import { CATEGORY } from "#/libs/systemsId.ts";
+import { selectedDate } from "./selectedDate";
 
 const handleSubmit = async (e: SubmitEvent) => {
     const submitter = e.submitter as
@@ -78,7 +78,7 @@ const handleSubmit = async (e: SubmitEvent) => {
                     formData.get("transaction_equity_change"),
                 );
                 const category = totalChange === 0
-                    ? TRANSFER_CATEGORY_ID
+                    ? CATEGORY.TRANSFER
                     : Number(formData.get("transaction_category"));
                 const affectedAccounts = formData.getAll("transaction_account");
                 const values = formData.getAll("transaction_value");
@@ -222,17 +222,7 @@ const handleSubmit = async (e: SubmitEvent) => {
             break;
         }
         case "edit_account": {
-            const accountId = Number(
-                formData.get("edit_account_account_id"),
-            );
-            const isSave = Boolean(formData.get("edit_account_save"));
-
-            if (!isSave) {
-                if (accountId) await accountsQuery.delete(accountId);
-                await refetchAllAccounts();
-                form.closest("dialog")?.close();
-                break;
-            }
+            const accountId = Number(formData.get("edit_account_account_id"));
 
             const oldName =
                 formData.get("edit_account_account_name")?.toString()
@@ -266,6 +256,26 @@ const handleSubmit = async (e: SubmitEvent) => {
 
                 await refetchAllAccounts();
             }
+
+            form.closest("dialog")?.close();
+            break;
+        }
+        case "delete_account": {
+            const id = Number(formData.get("delete_account_id"));
+            const rawDest = formData.get("delete_account_destination_account");
+            const rawContact = formData.get("delete_account_contact");
+
+            await accountsQuery.delete({
+                id,
+                destinationAccountId: rawDest === null ? null : Number(rawDest),
+                contactId: rawContact === null ? null : Number(rawContact),
+                date: new Date().toISOString(),
+            });
+
+            const [year, month] = selectedDate.value.split("-").map(Number);
+            await refetchTransactionsAtMonth(month, year);
+            await refetchBalances(month, year);
+            await refetchAllAccounts();
 
             form.closest("dialog")?.close();
             break;

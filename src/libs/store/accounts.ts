@@ -29,9 +29,16 @@ export const accountsQuery = {
             const [start, _end] = dateISORange(m, y);
             return invoke<AccountBalance[]>("balances_until_date", { start });
         },
+        one: (id: number) =>
+            invoke<AccountBalance>("get_account_balance", { id }),
     },
     post: (name: string) => invoke<number>("create_account", { name }),
     patch: (data: Partial<Pick<Accounts, "name" | "color">>) =>
         invoke("modify_account", { data }),
-    delete: (id: number) => invoke("delete_account", { id }),
+    delete: (data: {
+        id: number;
+        destinationAccountId: number | null;
+        contactId: number | null;
+        date: string;
+    }) => invoke<number>("delete_account", { data }),
 };

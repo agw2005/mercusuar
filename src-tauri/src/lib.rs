@@ -31,6 +31,7 @@ pub fn run() {
             ledger::categories::modify_category,
             ledger::categories::delete_category,
             ledger::accounts::get_all_accounts,
+            ledger::accounts::get_account_balance,
             ledger::accounts::balances_until_date,
             ledger::accounts::create_account,
             ledger::accounts::modify_account,
