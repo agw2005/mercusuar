@@ -9,7 +9,10 @@ const TableHead = () => {
                     .map((
                         account,
                     ) => (
-                        <th key={account.id}>
+                        <th
+                            key={account.id}
+                            title={account.archived ? "Archived" : void 0}
+                        >
                             {account.name}
                         </th>
                     ))}

@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::State;
 
 use crate::db::DbState;
@@ -20,6 +20,13 @@ pub struct AccountBalance {
     pub is_system: bool,
     pub color: String,
     pub balance: f64,
+}
+
+#[derive(Debug, Default, Deserialize)]
+pub struct UpdateAccount {
+    pub id: i64,
+    pub name: Option<String>,
+    pub color: Option<String>,
 }
 
 #[tauri::command]
@@ -81,4 +88,54 @@ pub async fn create_account(
         .map_err(|e| format!("Failed to create account: {e}"))?;
 
     Ok(result.last_insert_rowid())
+}
+
+#[tauri::command]
+pub async fn modify_account(
+    state: State<'_, DbState>,
+    data: UpdateAccount,
+) -> Result<u64, String> {
+    let name_trimmed = data
+        .name
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+
+    let color_trimmed = data
+        .color
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+
+    let result = sqlx::query(
+        "UPDATE Accounts
+         SET name = COALESCE(?, name),
+             color = COALESCE(?, color)
+         WHERE id = ?",
+    )
+    .bind(name_trimmed)
+    .bind(color_trimmed)
+    .bind(data.id)
+    .execute(&state.pool)
+    .await
+    .map_err(|e| format!("Failed to modify account: {e}"))?;
+
+    Ok(result.rows_affected())
+}
+
+#[tauri::command]
+pub async fn delete_account(
+    state: State<'_, DbState>,
+    id: i64,
+) -> Result<u64, String> {
+    let result = sqlx::query(
+        "DELETE FROM Accounts
+         WHERE id = (?)",
+    )
+    .bind(id)
+    .execute(&state.pool)
+    .await
+    .map_err(|e| format!("Failed to delete account: {e}"))?;
+
+    Ok(result.rows_affected())
 }

@@ -5,9 +5,9 @@ import { useSignal } from "@preact/signals";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
 const ManageCategories = () => {
-    const editCategoryModal = useRef<HTMLDialogElement>(null);
-    const editCategoryForm = useRef<HTMLFormElement>(null);
-    const focusedCategory = useSignal<Categories | null>(null);
+    const modal = useRef<HTMLDialogElement>(null);
+    const form = useRef<HTMLFormElement>(null);
+    const selectedCategory = useSignal<Categories | null>(null);
 
     return (
         <>
@@ -22,8 +22,8 @@ const ManageCategories = () => {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    focusedCategory.value = category;
-                                    editCategoryModal.current?.showModal();
+                                    selectedCategory.value = category;
+                                    modal.current?.showModal();
                                 }}
                             >
                                 &#9998;
@@ -34,14 +34,14 @@ const ManageCategories = () => {
             </ul>
 
             <dialog
-                ref={editCategoryModal}
+                ref={modal}
                 onClose={() => {
-                    editCategoryForm.current?.reset();
-                    focusedCategory.value = null;
+                    form.current?.reset();
+                    selectedCategory.value = null;
                 }}
                 onClick={(e) => {
-                    if (!editCategoryModal.current) return;
-                    const modalDimensions = editCategoryModal
+                    if (!modal.current) return;
+                    const modalDimensions = modal
                         .current
                         .getBoundingClientRect();
                     if (
@@ -50,12 +50,12 @@ const ManageCategories = () => {
                         e.clientY < modalDimensions.top ||
                         e.clientY > modalDimensions.bottom
                     ) {
-                        editCategoryModal.current.close();
+                        modal.current.close();
                     }
                 }}
             >
                 <form
-                    ref={editCategoryForm}
+                    ref={form}
                     data-form-type="edit_category"
                     onSubmit={handleSubmit}
                 >
@@ -64,8 +64,8 @@ const ManageCategories = () => {
                         <input
                             type="number"
                             readOnly
-                            value={focusedCategory.value?.id}
-                            placeholder={String(focusedCategory.value?.id)}
+                            value={selectedCategory.value?.id}
+                            placeholder={String(selectedCategory.value?.id)}
                             name="edit_category_category_id"
                             id="edit_category_category_id_element"
                         />
@@ -73,7 +73,7 @@ const ManageCategories = () => {
 
                     <input
                         type="hidden"
-                        value={focusedCategory.value?.name}
+                        value={selectedCategory.value?.name}
                         name="edit_category_category_name"
                     />
 
@@ -83,13 +83,13 @@ const ManageCategories = () => {
                             type="text"
                             name="edit_category_new_name"
                             id="edit_category_new_name_element"
-                            placeholder={focusedCategory.value?.name}
+                            placeholder={selectedCategory.value?.name}
                         />
                     </label>
 
                     <input
                         type="hidden"
-                        value={focusedCategory.value?.color}
+                        value={selectedCategory.value?.color}
                         name="edit_category_category_color"
                     />
 
@@ -99,7 +99,7 @@ const ManageCategories = () => {
                             type="color"
                             name="edit_category_new_color"
                             id="edit_category_new_color_element"
-                            defaultValue={focusedCategory.value?.color}
+                            defaultValue={selectedCategory.value?.color}
                         />
                     </label>
 

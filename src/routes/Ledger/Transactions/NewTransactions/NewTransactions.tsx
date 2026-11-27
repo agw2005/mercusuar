@@ -67,32 +67,35 @@ const NewTransactions = () => {
                                         },
                                     )}
                             >
-                                {allAccounts.value.filter((a) =>
-                                    a.id !== ACCOUNT.INVESTMENT
-                                ).map(
-                                    (account) => {
-                                        const alreadyExist = accountChanges
-                                            .value.some(
-                                                (other) =>
-                                                    account.id !==
-                                                        entry
-                                                            .accountId &&
-                                                    other.accountId ===
-                                                        account.id,
+                                {allAccounts.value
+                                    .filter((a) =>
+                                        a.id !== ACCOUNT.INVESTMENT &&
+                                        !a.archived
+                                    )
+                                    .map(
+                                        (account) => {
+                                            const alreadyExist = accountChanges
+                                                .value.some(
+                                                    (other) =>
+                                                        account.id !==
+                                                            entry
+                                                                .accountId &&
+                                                        other.accountId ===
+                                                            account.id,
+                                                );
+                                            if (alreadyExist) {
+                                                return null;
+                                            }
+                                            return (
+                                                <option
+                                                    key={account.id}
+                                                    value={account.id}
+                                                >
+                                                    {account.name}
+                                                </option>
                                             );
-                                        if (alreadyExist) {
-                                            return null;
-                                        }
-                                        return (
-                                            <option
-                                                key={account.id}
-                                                value={account.id}
-                                            >
-                                                {account.name}
-                                            </option>
-                                        );
-                                    },
-                                )}
+                                        },
+                                    )}
                             </select>
                         </label>
                         <label

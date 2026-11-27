@@ -4,7 +4,7 @@ import { ACCOUNT } from "#/libs/systemsId.ts";
 import DatePicker from "./DatePicker";
 import TableHead from "./TableHead";
 import RowBalance from "./RowBalance";
-import RowStartingBalance from "./RowStartingBalance";
+import RowStartOfMonthBalance from "./RowStartOfMonthBalance";
 import {
     dailyLedgers,
     startingBalanceMap,
@@ -21,7 +21,13 @@ const TransactionsTable = () => {
                     <table>
                         <TableHead />
                         <tbody>
-                            <RowStartingBalance />
+                            <RowStartOfMonthBalance
+                                balanceMap={startingBalanceMap.value}
+                                nonSystemAccounts={transactionsTableData
+                                    .nonSystemAccounts.value}
+                                startingEquity={transactionsTableData
+                                    .startingEquity.value}
+                            />
 
                             {/* Only render a standalone Balance row for day 1 if no transactions occurred on day 1 */}
                             {!transactionsTableData
@@ -49,7 +55,7 @@ const TransactionsTable = () => {
                                                         change
                                                             .accountId ===
                                                             ACCOUNT.RECEIVABLE,
-                                                );
+                                                )?.value;
                                             const debtChange = transaction
                                                 .changes
                                                 .find(
@@ -57,7 +63,7 @@ const TransactionsTable = () => {
                                                         change
                                                             .accountId ===
                                                             ACCOUNT.DEBT,
-                                                );
+                                                )?.value;
                                             const investmentChange = transaction
                                                 .changes
                                                 .find(
@@ -65,7 +71,34 @@ const TransactionsTable = () => {
                                                         change
                                                             .accountId ===
                                                             ACCOUNT.INVESTMENT,
+                                                )?.value;
+                                            const equityChange = transaction
+                                                .changes
+                                                .reduce(
+                                                    (
+                                                        acc,
+                                                        curr,
+                                                    ) => curr
+                                                            .accountId ===
+                                                            ACCOUNT
+                                                                .DEBT
+                                                        ? acc -
+                                                            curr.value
+                                                        : acc +
+                                                            curr.value,
+                                                    0,
                                                 );
+                                            const category = allCategories
+                                                .value.find(
+                                                    (
+                                                        category,
+                                                    ) => category
+                                                        .id ===
+                                                        transaction
+                                                            .category,
+                                                )?.name;
+                                            const description = transaction
+                                                .description;
                                             return (
                                                 <tr
                                                     key={transaction
@@ -95,51 +128,12 @@ const TransactionsTable = () => {
                                                                     )?.value}
                                                             </td>
                                                         ))}
-                                                    <td>
-                                                        {investmentChange
-                                                            ?.value}
-                                                    </td>
-                                                    <td>
-                                                        {receivableChange
-                                                            ?.value}
-                                                    </td>
-                                                    <td>
-                                                        {debtChange
-                                                            ?.value}
-                                                    </td>
-                                                    <td>
-                                                        {transaction
-                                                            .changes
-                                                            .reduce(
-                                                                (
-                                                                    acc,
-                                                                    curr,
-                                                                ) => curr
-                                                                        .accountId ===
-                                                                        ACCOUNT
-                                                                            .DEBT
-                                                                    ? acc -
-                                                                        curr.value
-                                                                    : acc +
-                                                                        curr.value,
-                                                                0,
-                                                            )}
-                                                    </td>
-                                                    <td>
-                                                        {allCategories
-                                                            .value.find(
-                                                                (
-                                                                    category,
-                                                                ) => category
-                                                                    .id ===
-                                                                    transaction
-                                                                        .category,
-                                                            )?.name}
-                                                    </td>
-                                                    <td>
-                                                        {transaction
-                                                            .description}
-                                                    </td>
+                                                    <td>{investmentChange}</td>
+                                                    <td>{receivableChange}</td>
+                                                    <td>{debtChange}</td>
+                                                    <td>{equityChange}</td>
+                                                    <td>{category}</td>
+                                                    <td>{description}</td>
                                                 </tr>
                                             );
                                         },

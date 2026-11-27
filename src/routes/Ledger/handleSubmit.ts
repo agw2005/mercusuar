@@ -15,7 +15,7 @@ import {
     fundTypesQuery,
     refetchUnarchivedFundTypes,
 } from "#/libs/store/fundType.ts";
-import type { AccountChange, Categories } from "#/types.d.ts";
+import type { AccountChange, Accounts, Categories } from "#/types.d.ts";
 import {
     refetchTransactionsAtMonth,
     transactionsQuery,
@@ -216,6 +216,55 @@ const handleSubmit = async (e: SubmitEvent) => {
                 await categoriesQuery.patch(data);
 
                 await refetchAllCategories();
+            }
+
+            form.closest("dialog")?.close();
+            break;
+        }
+        case "edit_account": {
+            const accountId = Number(
+                formData.get("edit_account_account_id"),
+            );
+            const isSave = Boolean(formData.get("edit_account_save"));
+
+            if (!isSave) {
+                if (accountId) await accountsQuery.delete(accountId);
+                await refetchAllAccounts();
+                form.closest("dialog")?.close();
+                break;
+            }
+
+            const oldName =
+                formData.get("edit_account_account_name")?.toString()
+                    .trim() ?? "";
+            const newName =
+                formData.get("edit_account_new_name")?.toString().trim() ?? "";
+
+            const oldColor =
+                formData.get("edit_account_account_color")?.toString()
+                    .trim() ?? "";
+            const newColor =
+                formData.get("edit_account_new_color")?.toString().trim() ??
+                    "";
+
+            const updates: Partial<Pick<Accounts, "name" | "color">> = {};
+
+            if (newName && newName !== oldName) {
+                updates.name = newName;
+            }
+
+            if (newColor && newColor !== oldColor) {
+                updates.color = newColor;
+            }
+
+            if (Object.keys(updates).length === 0) {
+                console.log("No changes detected.");
+            } else {
+                const data = { id: accountId, ...updates };
+
+                await accountsQuery.patch(data);
+
+                await refetchAllAccounts();
             }
 
             form.closest("dialog")?.close();

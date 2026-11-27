@@ -31,4 +31,7 @@ export const accountsQuery = {
         },
     },
     post: (name: string) => invoke<number>("create_account", { name }),
+    patch: (data: Partial<Pick<Accounts, "name" | "color">>) =>
+        invoke("modify_account", { data }),
+    delete: (id: number) => invoke("delete_account", { id }),
 };
