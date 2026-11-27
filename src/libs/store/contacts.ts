@@ -27,4 +27,6 @@ export const contactsQuery = {
         all_claims: () => invoke<Claim[]>("get_all_claims"),
     },
     post: (name: string) => invoke<number>("create_contact", { name }),
+    patch: (data: Partial<Pick<Contacts, "name" | "color">>) =>
+        invoke("modify_contact", { data }),
 };

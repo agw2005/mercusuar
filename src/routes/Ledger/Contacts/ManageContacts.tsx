@@ -4,12 +4,15 @@ import { useSignal } from "@preact/signals";
 import { useRef } from "preact/hooks";
 import { closeModalOutsideBox } from "#/libs/closeModalOutsideBox.ts";
 import ClaimsTable from "./ClaimsTable";
+import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
 const ManageContacts = () => {
     const modalContact = useSignal<Contacts | null>(null);
     const checkboxContacts = useSignal<number[]>([]);
 
     const modal = useRef<HTMLDialogElement>(null);
+    const editForm = useRef<HTMLFormElement>(null);
+
     return (
         <>
             <h3>Manage Contacts</h3>
@@ -73,12 +76,70 @@ const ManageContacts = () => {
 
             <dialog
                 ref={modal}
-                onClose={() => {
-                    modalContact.value = null;
-                }}
+                onClose={() => modalContact.value = null}
                 onClick={(e) => closeModalOutsideBox(e, modal)}
             >
-                Hello World
+                <form
+                    ref={editForm}
+                    data-form-type="edit_contact"
+                    onSubmit={handleSubmit}
+                >
+                    <h4>Edit Contact</h4>
+
+                    <label htmlFor="edit_contact_contact_id_element">
+                        ID{" "}
+                        <input
+                            type="number"
+                            readOnly
+                            value={modalContact.value?.id}
+                            name="edit_contact_contact_id"
+                            id="edit_contact_contact_id_element"
+                        />
+                    </label>
+
+                    <input
+                        type="hidden"
+                        value={modalContact.value?.name}
+                        name="edit_contact_contact_name"
+                    />
+
+                    <label htmlFor="edit_contact_new_name_element">
+                        Name{" "}
+                        <input
+                            type="text"
+                            name="edit_contact_new_name"
+                            id="edit_contact_new_name_element"
+                            placeholder={modalContact.value?.name}
+                        />
+                    </label>
+
+                    <input
+                        type="hidden"
+                        value={modalContact.value?.color}
+                        name="edit_contact_contact_color"
+                    />
+
+                    <label htmlFor="edit_contact_new_color_element">
+                        Color{" "}
+                        <input
+                            type="color"
+                            name="edit_contact_new_color"
+                            id="edit_contact_new_color_element"
+                            defaultValue={modalContact.value?.color}
+                        />
+                    </label>
+
+                    <button type="submit">Save</button>
+                </form>
+
+                <hr />
+
+                <button
+                    type="button"
+                    onClick={() => modal.current?.close()}
+                >
+                    Cancel
+                </button>
             </dialog>
         </>
     );

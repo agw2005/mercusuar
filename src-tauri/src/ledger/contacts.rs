@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::State;
 
 use crate::db::DbState;
@@ -22,6 +22,13 @@ pub struct Claim {
     pub date: String,
     pub description: String,
     pub value: f64,
+}
+
+#[derive(Debug, Default, Deserialize)]
+pub struct UpdateContact {
+    pub id: i64,
+    pub name: Option<String>,
+    pub color: Option<String>,
 }
 
 #[tauri::command]
@@ -93,4 +100,37 @@ pub async fn get_all_claims(
     .fetch_all(&state.pool)
     .await
     .map_err(|e| format!("Failed to fetch claims: {e}"))
+}
+
+#[tauri::command]
+pub async fn modify_contact(
+    state: State<'_, DbState>,
+    data: UpdateContact,
+) -> Result<u64, String> {
+    let name_trimmed = data
+        .name
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+
+    let color_trimmed = data
+        .color
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+
+    let result = sqlx::query(
+        "UPDATE Contacts
+         SET name = COALESCE(?, name),
+             color = COALESCE(?, color)
+         WHERE id = ?",
+    )
+    .bind(name_trimmed)
+    .bind(color_trimmed)
+    .bind(data.id)
+    .execute(&state.pool)
+    .await
+    .map_err(|e| format!("Failed to modify contact: {e}"))?;
+
+    Ok(result.rows_affected())
 }

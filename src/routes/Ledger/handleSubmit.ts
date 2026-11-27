@@ -9,13 +9,19 @@ import {
 } from "#/libs/store/accounts.ts";
 import {
     contactsQuery,
+    refetchClaims,
     refetchUnarchivedContacts,
 } from "#/libs/store/contacts.ts";
 import {
     fundTypesQuery,
     refetchUnarchivedFundTypes,
 } from "#/libs/store/fundType.ts";
-import type { AccountChange, Accounts, Categories } from "#/types.d.ts";
+import type {
+    AccountChange,
+    Accounts,
+    Categories,
+    Contacts,
+} from "#/types.d.ts";
 import {
     refetchTransactionsAtMonth,
     transactionsQuery,
@@ -276,6 +282,46 @@ const handleSubmit = async (e: SubmitEvent) => {
             await refetchTransactionsAtMonth(month, year);
             await refetchBalances(month, year);
             await refetchAllAccounts();
+
+            form.closest("dialog")?.close();
+            break;
+        }
+        case "edit_contact": {
+            const contactId = Number(formData.get("edit_contact_contact_id"));
+
+            const oldName =
+                formData.get("edit_contact_contact_name")?.toString()
+                    .trim() ?? "";
+            const newName =
+                formData.get("edit_contact_new_name")?.toString().trim() ?? "";
+
+            const oldColor =
+                formData.get("edit_contact_contact_color")?.toString()
+                    .trim() ?? "";
+            const newColor =
+                formData.get("edit_contact_new_color")?.toString().trim() ??
+                    "";
+
+            const updates: Partial<Pick<Contacts, "name" | "color">> = {};
+
+            if (newName && newName !== oldName) {
+                updates.name = newName;
+            }
+
+            if (newColor && newColor !== oldColor) {
+                updates.color = newColor;
+            }
+
+            if (Object.keys(updates).length === 0) {
+                console.log("No changes detected.");
+            } else {
+                const data = { id: contactId, ...updates };
+
+                await contactsQuery.patch(data);
+
+                await refetchClaims();
+                await refetchUnarchivedContacts();
+            }
 
             form.closest("dialog")?.close();
             break;
