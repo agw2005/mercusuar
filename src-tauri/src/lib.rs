@@ -38,6 +38,7 @@ pub fn run() {
             ledger::accounts::delete_account,
             ledger::contacts::get_unarchived_contacts,
             ledger::contacts::create_contact,
+            ledger::contacts::get_all_claims,
             ledger::fund_types::get_unarchived_fund_types,
             ledger::fund_types::create_fund_type,
             ledger::transactions::get_transactions_at_month,

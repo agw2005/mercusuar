@@ -123,6 +123,7 @@ export interface TransactionsAtDay {
 }
 
 export interface Claim {
+    claim_type: "r" | "d";
     id: number;
     transaction_id: number;
     contact_id: number;

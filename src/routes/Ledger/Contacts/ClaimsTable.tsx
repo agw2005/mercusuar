@@ -3,26 +3,29 @@ import { formatIsoToDayMonth } from "#/libs/ISOToDateMonth.ts";
 import { useComputed } from "@preact/signals";
 
 interface ClaimsTable {
-    caption: "Receivables" | "Debts";
     claims: Claim[];
     contact: Contacts;
 }
-const ClaimsTable = ({ caption, claims, contact }: ClaimsTable) => {
+const ClaimsTable = ({ claims, contact }: ClaimsTable) => {
     const totalClaims = useComputed<number>(() => {
         return claims
             .filter((claim) => claim.contact_id === contact.id)
-            .reduce((acc, curr) => acc + curr.value, 0);
+            .reduce((acc, curr) => {
+                return curr.claim_type === "r"
+                    ? acc + curr.value
+                    : acc - curr.value;
+            }, 0);
     });
 
     const empty = !claims.some((claim) => claim.contact_id === contact.id);
 
-    if (empty) return <p>No {caption}</p>;
+    if (empty) return <p>No claims.</p>;
     else {
         return (
             <table>
-                <caption>{caption}</caption>
                 <thead>
                     <tr>
+                        <th>Claim</th>
                         <th>Date</th>
                         <th>Description</th>
                         <th>Change</th>
@@ -37,6 +40,11 @@ const ClaimsTable = ({ caption, claims, contact }: ClaimsTable) => {
                         .map((claim) => (
                             <tr key={claim.id}>
                                 <td>
+                                    {claim.claim_type === "d"
+                                        ? "Debt"
+                                        : "Receivable"}
+                                </td>
+                                <td>
                                     {formatIsoToDayMonth(
                                         claim.date,
                                     )}
@@ -50,8 +58,25 @@ const ClaimsTable = ({ caption, claims, contact }: ClaimsTable) => {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colSpan={2}>Total</td>
-                        <td>{totalClaims}</td>
+                        {totalClaims.value === 0
+                            ? (
+                                <>
+                                    <td colSpan={3}>
+                                        Nothing owned or obligated.
+                                    </td>
+                                    <td>{totalClaims.value}</td>
+                                </>
+                            )
+                            : (
+                                <>
+                                    <td colSpan={3}>
+                                        Amount {totalClaims.value < 0
+                                            ? "Owed"
+                                            : "Obligated"}
+                                    </td>
+                                    <td>{Math.abs(totalClaims.value)}</td>
+                                </>
+                            )}
                     </tr>
                 </tfoot>
             </table>

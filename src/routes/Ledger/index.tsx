@@ -1,7 +1,10 @@
 import { useEffect } from "preact/hooks";
 import { refetchAllCategories } from "#/libs/store/categories.ts";
 import { refetchAllAccounts } from "#/libs/store/accounts.ts";
-import { refetchUnarchivedContacts } from "#/libs/store/contacts.ts";
+import {
+    refetchClaims,
+    refetchUnarchivedContacts,
+} from "#/libs/store/contacts.ts";
 import { refetchUnarchivedFundTypes } from "#/libs/store/fundType.ts";
 import { refetchInvestments } from "#/libs/store/investments.ts";
 import { refetchInvestmentLots } from "#/libs/store/investmentLots.ts";
@@ -22,6 +25,7 @@ const Ledger = () => {
         refetchUnarchivedFundTypes();
         refetchInvestments();
         refetchInvestmentLots();
+        refetchClaims();
     }, []);
 
     return (

@@ -1,8 +1,9 @@
 import { signal } from "@preact/signals";
-import type { Contacts } from "#/types.d.ts";
+import type { Claim, Contacts } from "#/types.d.ts";
 import { invoke } from "@tauri-apps/api/core";
 
 export const unarchivedContacts = signal<Contacts[]>([]);
+export const allClaims = signal<Claim[]>([]);
 
 export const refetchUnarchivedContacts = async () => {
     try {
@@ -12,9 +13,18 @@ export const refetchUnarchivedContacts = async () => {
     }
 };
 
+export const refetchClaims = async () => {
+    try {
+        allClaims.value = await contactsQuery.get.all_claims();
+    } catch (error) {
+        console.error("Failed to fetch claims:", error);
+    }
+};
+
 export const contactsQuery = {
     get: {
         all_unarchived: () => invoke<Contacts[]>("get_unarchived_contacts"),
+        all_claims: () => invoke<Claim[]>("get_all_claims"),
     },
     post: (name: string) => invoke<number>("create_contact", { name }),
 };
