@@ -3,6 +3,7 @@ import { useRef } from "preact/hooks";
 import type { Categories } from "#/types.d.ts";
 import { useSignal } from "@preact/signals";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
+import { closeModalOutsideBox } from "#/libs/closeModalOutsideBox.ts";
 
 const ManageCategories = () => {
     const modal = useRef<HTMLDialogElement>(null);
@@ -39,20 +40,7 @@ const ManageCategories = () => {
                     form.current?.reset();
                     selectedCategory.value = null;
                 }}
-                onClick={(e) => {
-                    if (!modal.current) return;
-                    const modalDimensions = modal
-                        .current
-                        .getBoundingClientRect();
-                    if (
-                        e.clientX < modalDimensions.left ||
-                        e.clientX > modalDimensions.right ||
-                        e.clientY < modalDimensions.top ||
-                        e.clientY > modalDimensions.bottom
-                    ) {
-                        modal.current.close();
-                    }
-                }}
+                onClick={(e) => closeModalOutsideBox(e, modal)}
             >
                 <form
                     ref={form}

@@ -5,6 +5,7 @@ import { useRef } from "preact/hooks";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
 import { ACCOUNT } from "#/libs/systemsId.ts";
 import { unarchivedContacts } from "#/libs/store/contacts.ts";
+import { closeModalOutsideBox } from "#/libs/closeModalOutsideBox.ts";
 
 const ManageAccounts = () => {
     const modal = useRef<HTMLDialogElement>(null);
@@ -70,20 +71,7 @@ const ManageAccounts = () => {
                     selectedSourceAccount.value = null;
                     destinationAccountId.value = null;
                 }}
-                onClick={(e) => {
-                    if (!modal.current) return;
-                    const modalDimensions = modal
-                        .current
-                        .getBoundingClientRect();
-                    if (
-                        e.clientX < modalDimensions.left ||
-                        e.clientX > modalDimensions.right ||
-                        e.clientY < modalDimensions.top ||
-                        e.clientY > modalDimensions.bottom
-                    ) {
-                        modal.current.close();
-                    }
-                }}
+                onClick={(e) => closeModalOutsideBox(e, modal)}
             >
                 <form
                     ref={editForm}
