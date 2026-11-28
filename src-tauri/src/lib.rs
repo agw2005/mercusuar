@@ -47,6 +47,8 @@ pub fn run() {
             ledger::fund_types::delete_fund_type,
             ledger::transactions::get_transactions_at_month,
             ledger::transactions::create_transaction,
+            ledger::transactions::patch_transactions,
+            ledger::transactions::delete_transactions,
             ledger::investments::get_unarchived_investments,
             ledger::investments::create_investment,
             ledger::investment_lots::get_all_holdings,

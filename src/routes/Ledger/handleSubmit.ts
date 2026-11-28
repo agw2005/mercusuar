@@ -31,7 +31,7 @@ import {
     investmentLotsQuery,
     refetchInvestmentLots,
 } from "#/libs/store/investmentLots.ts";
-import { CATEGORY } from "#/libs/systemsId.ts";
+import { ACCOUNT, CATEGORY } from "#/libs/systemsId.ts";
 import { selectedDate } from "./selectedDate";
 
 const handleSubmit = async (e: SubmitEvent) => {
@@ -388,6 +388,70 @@ const handleSubmit = async (e: SubmitEvent) => {
 
                 await refetchAllFundTypes();
             }
+
+            form.closest("dialog")?.close();
+            break;
+        }
+        case "edit_transaction": {
+            const transactionsDate =
+                formData.get("edit_tx_date")?.toString().trim() ?? "";
+            const transactionIds = formData.getAll("edit_tx_id");
+            const accountIds = formData.getAll("edit_tx_account_id");
+            const values = formData.getAll("edit_tx_value");
+            const rawContact = formData.get("edit_tx_contact");
+            const description =
+                formData.get("edit_tx_description")?.toString().trim() ?? "";
+            const contactId = rawContact === null ? null : Number(rawContact);
+
+            const changes: (AccountChange & { transactionId: number })[] =
+                accountIds.map((
+                    accountId,
+                    index,
+                ) => ({
+                    accountId: Number(accountId),
+                    value: Number(values[index]),
+                    transactionId: Number(transactionIds[index]),
+                }));
+
+            const equityChange = changes.reduce((acc, curr) => {
+                return curr.accountId === ACCOUNT.DEBT
+                    ? acc - curr.value
+                    : acc + curr.value;
+            }, 0);
+
+            const categoryId = equityChange === 0
+                ? CATEGORY.TRANSFER
+                : Number(formData.get("edit_tx_category"));
+
+            await transactionsQuery.patch(
+                transactionsDate,
+                categoryId,
+                changes,
+                contactId,
+                description,
+            );
+
+            const [year, month] = selectedDate.value.split("-").map(Number);
+            await refetchTransactionsAtMonth(month, year);
+            await refetchBalances(month, year);
+            await refetchClaims();
+
+            form.closest("dialog")?.close();
+            break;
+        }
+        case "delete_transaction": {
+            const transactionsDate =
+                formData.get("delete_tx_date")?.toString().trim() ?? "";
+            const transactionIds = formData.getAll("delete_tx_id").map((id) =>
+                Number(id)
+            );
+
+            await transactionsQuery.delete(transactionsDate, transactionIds);
+
+            const [year, month] = selectedDate.value.split("-").map(Number);
+            await refetchTransactionsAtMonth(month, year);
+            await refetchBalances(month, year);
+            await refetchClaims();
 
             form.closest("dialog")?.close();
             break;

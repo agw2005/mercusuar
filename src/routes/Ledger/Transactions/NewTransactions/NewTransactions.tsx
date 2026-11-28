@@ -11,6 +11,7 @@ import { allAccounts } from "#/libs/store/accounts.ts";
 import { ACCOUNT } from "#/libs/systemsId.ts";
 import { unarchivedContacts } from "#/libs/store/contacts.ts";
 import { selectedDate } from "#view/Ledger/selectedDate.ts";
+import { isoToDateTimeInput } from "#/libs/isoToDateTimeInput.ts";
 
 const NewTransactions = () => {
     return (
@@ -177,9 +178,7 @@ const NewTransactions = () => {
                     Date
                     <input
                         required
-                        defaultValue={new Date()
-                            .toISOString()
-                            .slice(0, 16)}
+                        defaultValue={isoToDateTimeInput(new Date())}
                         type="datetime-local"
                         name="transaction_date"
                         id="transaction_date_element"

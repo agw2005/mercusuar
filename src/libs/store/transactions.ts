@@ -36,4 +36,26 @@ export const transactionsQuery = {
         description,
         date,
     }),
+    patch: (
+        transactionsDate: string,
+        categoryId: number,
+        changes: (AccountChange & {
+            transactionId: number;
+        })[],
+        contactId: number | null,
+        description: string,
+    ) => invoke("patch_transactions", {
+        transactionsDate,
+        categoryId,
+        changes,
+        contactId,
+        description,
+    }),
+    delete: (
+        transactionsDate: string,
+        transactionIds: number[],
+    ) => invoke("delete_transactions", {
+        transactionsDate,
+        transactionIds,
+    }),
 };
