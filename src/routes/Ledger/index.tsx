@@ -5,7 +5,7 @@ import {
     refetchClaims,
     refetchUnarchivedContacts,
 } from "#/libs/store/contacts.ts";
-import { refetchUnarchivedFundTypes } from "#/libs/store/fundType.ts";
+import { refetchAllFundTypes } from "#/libs/store/fundType.ts";
 import { refetchInvestments } from "#/libs/store/investments.ts";
 import { refetchInvestmentLots } from "#/libs/store/investmentLots.ts";
 import Layout from "#/components/Layout.tsx";
@@ -22,7 +22,7 @@ const Ledger = () => {
         refetchAllCategories();
         refetchAllAccounts();
         refetchUnarchivedContacts();
-        refetchUnarchivedFundTypes();
+        refetchAllFundTypes();
         refetchInvestments();
         refetchInvestmentLots();
         refetchClaims();

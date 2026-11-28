@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::State;
 
 use crate::db::DbState;
@@ -11,12 +11,19 @@ pub struct FundType {
     pub color: String,
 }
 
+#[derive(Debug, Default, Deserialize)]
+pub struct UpdateFundType {
+    pub id: i64,
+    pub name: Option<String>,
+    pub color: Option<String>,
+}
+
 #[tauri::command]
-pub async fn get_unarchived_fund_types(
+pub async fn get_all_fund_types(
     state: State<'_, DbState>,
 ) -> Result<Vec<FundType>, String> {
     sqlx::query_as::<_, FundType>(
-        "SELECT id, name, archived, color FROM Fund_Types WHERE archived = 0",
+        "SELECT id, name, archived, color FROM Fund_Types",
     )
     .fetch_all(&state.pool)
     .await
@@ -40,4 +47,54 @@ pub async fn create_fund_type(
         .map_err(|e| format!("Failed to create fund type: {e}"))?;
 
     Ok(result.last_insert_rowid())
+}
+
+#[tauri::command]
+pub async fn modify_fund_type(
+    state: State<'_, DbState>,
+    data: UpdateFundType,
+) -> Result<u64, String> {
+    let name_trimmed = data
+        .name
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+
+    let color_trimmed = data
+        .color
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+
+    let result = sqlx::query(
+        "UPDATE Fund_Types
+         SET name = COALESCE(?, name),
+             color = COALESCE(?, color)
+         WHERE id = ?",
+    )
+    .bind(name_trimmed)
+    .bind(color_trimmed)
+    .bind(data.id)
+    .execute(&state.pool)
+    .await
+    .map_err(|e| format!("Failed to modify fund type: {e}"))?;
+
+    Ok(result.rows_affected())
+}
+
+#[tauri::command]
+pub async fn delete_fund_type(
+    state: State<'_, DbState>,
+    id: i64,
+) -> Result<u64, String> {
+    let result = sqlx::query(
+        "DELETE FROM Fund_Types
+         WHERE id = (?)",
+    )
+    .bind(id)
+    .execute(&state.pool)
+    .await
+    .map_err(|e| format!("Failed to delete fund type: {e}"))?;
+
+    Ok(result.rows_affected())
 }

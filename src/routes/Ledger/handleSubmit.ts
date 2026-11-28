@@ -12,10 +12,7 @@ import {
     refetchClaims,
     refetchUnarchivedContacts,
 } from "#/libs/store/contacts.ts";
-import {
-    fundTypesQuery,
-    refetchUnarchivedFundTypes,
-} from "#/libs/store/fundType.ts";
+import { fundTypesQuery, refetchAllFundTypes } from "#/libs/store/fundType.ts";
 import type {
     AccountChange,
     Accounts,
@@ -75,7 +72,7 @@ const handleSubmit = async (e: SubmitEvent) => {
             {
                 const name = String(formData.get("fund_type_name")).trim();
                 await fundTypesQuery.post(name);
-                await refetchUnarchivedFundTypes();
+                await refetchAllFundTypes();
             }
             break;
         case "transaction":
@@ -341,6 +338,56 @@ const handleSubmit = async (e: SubmitEvent) => {
             await refetchBalances(month, year);
             await refetchClaims();
             await refetchUnarchivedContacts();
+
+            form.closest("dialog")?.close();
+            break;
+        }
+        case "edit_fund_type": {
+            const fundTypeId = Number(
+                formData.get("edit_fund_type_fund_type_id"),
+            );
+            const isSave = Boolean(formData.get("edit_fund_type_save"));
+
+            if (!isSave) {
+                if (fundTypeId) await fundTypesQuery.delete(fundTypeId);
+                await refetchAllFundTypes();
+                form.closest("dialog")?.close();
+                break;
+            }
+
+            const oldName =
+                formData.get("edit_fund_type_fund_type_name")?.toString()
+                    .trim() ?? "";
+            const newName =
+                formData.get("edit_fund_type_new_name")?.toString().trim() ??
+                    "";
+
+            const oldColor =
+                formData.get("edit_fund_type_fund_type_color")?.toString()
+                    .trim() ?? "";
+            const newColor =
+                formData.get("edit_fund_type_new_color")?.toString().trim() ??
+                    "";
+
+            const updates: Partial<Pick<Categories, "name" | "color">> = {};
+
+            if (newName && newName !== oldName) {
+                updates.name = newName;
+            }
+
+            if (newColor && newColor !== oldColor) {
+                updates.color = newColor;
+            }
+
+            if (Object.keys(updates).length === 0) {
+                console.log("No changes detected.");
+            } else {
+                const data = { id: fundTypeId, ...updates };
+
+                await fundTypesQuery.patch(data);
+
+                await refetchAllFundTypes();
+            }
 
             form.closest("dialog")?.close();
             break;

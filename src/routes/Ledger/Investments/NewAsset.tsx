@@ -1,5 +1,5 @@
 import GenericForm from "#/components/GenericForm.tsx";
-import { unarchivedFundTypes } from "#/libs/store/fundType.ts";
+import { allFundTypes } from "#/libs/store/fundType.ts";
 import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
 const NewAsset = () => {
@@ -18,16 +18,18 @@ const NewAsset = () => {
                         name="investment_asset_fund_type"
                         id="investment_asset_fund_type_element"
                     >
-                        {unarchivedFundTypes.value.map((fund_type) => {
-                            return (
-                                <option
-                                    key={fund_type.id}
-                                    value={fund_type.id}
-                                >
-                                    {fund_type.name}
-                                </option>
-                            );
-                        })}
+                        {allFundTypes.value
+                            .filter((fund_type) => !fund_type.archived)
+                            .map((fund_type) => {
+                                return (
+                                    <option
+                                        key={fund_type.id}
+                                        value={fund_type.id}
+                                    >
+                                        {fund_type.name}
+                                    </option>
+                                );
+                            })}
                     </select>
                 </label>
                 <label htmlFor="investment_asset_name_element">

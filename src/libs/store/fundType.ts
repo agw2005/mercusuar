@@ -2,19 +2,22 @@ import { signal } from "@preact/signals";
 import type { FundTypes } from "#/types.d.ts";
 import { invoke } from "@tauri-apps/api/core";
 
-export const unarchivedFundTypes = signal<FundTypes[]>([]);
+export const allFundTypes = signal<FundTypes[]>([]);
 
-export const refetchUnarchivedFundTypes = async () => {
+export const refetchAllFundTypes = async () => {
     try {
-        unarchivedFundTypes.value = await fundTypesQuery.get.all_unarchived();
+        allFundTypes.value = await fundTypesQuery.get.all();
     } catch (error) {
-        console.error("Failed to fetch unarchived fund types:", error);
+        console.error("Failed to fetch all fund types:", error);
     }
 };
 
 export const fundTypesQuery = {
     get: {
-        all_unarchived: () => invoke<FundTypes[]>("get_unarchived_fund_types"),
+        all: () => invoke<FundTypes[]>("get_all_fund_types"),
     },
     post: (name: string) => invoke<number>("create_fund_type", { name }),
+    patch: (data: Partial<Pick<FundTypes, "name" | "color">>) =>
+        invoke("modify_fund_type", { data }),
+    delete: (id: number) => invoke("delete_fund_type", { id }),
 };
