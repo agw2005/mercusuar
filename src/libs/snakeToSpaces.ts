@@ -5,5 +5,5 @@
  * @returns The string with underscores replaced by spaces.
  */
 export const snakeToSpaces = (input: string): string => {
-    return input.replace(/_/g, " ");
+  return input.replace(/_/g, " ");
 };

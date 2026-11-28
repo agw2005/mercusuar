@@ -1,28 +1,28 @@
 import { refetchTransactionsAtMonth } from "#/libs/store/transactions.ts";
 import { refetchBalances } from "#/libs/store/accounts.ts";
 import { useEffect } from "preact/hooks";
-import { selectedDate } from "../selectedDate";
-import TransactionsTable from "./TransactionsTable/TransactionsTable";
-import NewTransactions from "./NewTransactions/NewTransactions";
+import { selectedDate } from "#view/Ledger/selectedDate.ts";
+import TransactionsTable from "./TransactionsTable/TransactionsTable.tsx";
+import NewTransactions from "./NewTransactions/NewTransactions.tsx";
 
 const Transactions = () => {
-    useEffect(() => {
-        const split = selectedDate.value.split("-");
-        const year = Number(split[0]);
-        const month = Number(split[1]);
-        refetchTransactionsAtMonth(month, year);
-        refetchBalances(month, year);
-    }, [selectedDate.value]);
+  useEffect(() => {
+    const split = selectedDate.value.split("-");
+    const year = Number(split[0]);
+    const month = Number(split[1]);
+    refetchTransactionsAtMonth(month, year);
+    refetchBalances(month, year);
+  }, [selectedDate.value]);
 
-    return (
-        <section>
-            <h2>Transactions</h2>
+  return (
+    <section>
+      <h2>Transactions</h2>
 
-            <TransactionsTable />
+      <TransactionsTable />
 
-            <NewTransactions />
-        </section>
-    );
+      <NewTransactions />
+    </section>
+  );
 };
 
 export default Transactions;

@@ -5,5 +5,5 @@ import { formatIsoToDayMonth } from "#/libs/ISOToDateMonth.ts";
 export const selectedDate = signal(dateToYearMonth(new Date()));
 
 export const startingDayLabel = computed(() =>
-    formatIsoToDayMonth(new Date(selectedDate.value).toISOString())
+  formatIsoToDayMonth(new Date(selectedDate.value).toISOString())
 );

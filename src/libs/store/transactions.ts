@@ -6,56 +6,59 @@ import { invoke } from "@tauri-apps/api/core";
 export const transactionsAtMonth = signal<Transactions[]>([]);
 
 export const refetchTransactionsAtMonth = async (m: number, y: number) => {
-    try {
-        transactionsAtMonth.value = await transactionsQuery.get.at_month(m, y);
-    } catch (error) {
-        console.error("Failed to fetch transactions:", error);
-    }
+  try {
+    transactionsAtMonth.value = await transactionsQuery.get.at_month(m, y);
+  } catch (error) {
+    console.error("Failed to fetch transactions:", error);
+  }
 };
 
 export const transactionsQuery = {
-    get: {
-        at_month: (m: number, y: number) => {
-            const [start, end] = dateISORange(m, y);
-            return invoke<Transactions[]>("get_transactions_at_month", {
-                start,
-                end,
-            });
-        },
+  get: {
+    at_month: (m: number, y: number) => {
+      const [start, end] = dateISORange(m, y);
+      return invoke<Transactions[]>("get_transactions_at_month", {
+        start,
+        end,
+      });
     },
-    post: (
-        category: number,
-        changes: AccountChange[],
-        contact: number | null,
-        description: string,
-        date: string,
-    ) => invoke<number[]>("create_transaction", {
-        category,
-        changes,
-        contact,
-        description,
-        date,
+  },
+  post: (
+    category: number,
+    changes: AccountChange[],
+    contact: number | null,
+    description: string,
+    date: string,
+  ) =>
+    invoke<number[]>("create_transaction", {
+      category,
+      changes,
+      contact,
+      description,
+      date,
     }),
-    patch: (
-        transactionsDate: string,
-        categoryId: number,
-        changes: (AccountChange & {
-            transactionId: number;
-        })[],
-        contactId: number | null,
-        description: string,
-    ) => invoke("patch_transactions", {
-        transactionsDate,
-        categoryId,
-        changes,
-        contactId,
-        description,
+  patch: (
+    transactionsDate: string,
+    categoryId: number,
+    changes: (AccountChange & {
+      transactionId: number;
+    })[],
+    contactId: number | null,
+    description: string,
+  ) =>
+    invoke("patch_transactions", {
+      transactionsDate,
+      categoryId,
+      changes,
+      contactId,
+      description,
     }),
-    delete: (
-        transactionsDate: string,
-        transactionIds: number[],
-    ) => invoke("delete_transactions", {
-        transactionsDate,
-        transactionIds,
+  delete: (
+    transactionsDate: string,
+    transactionIds: number[],
+  ) =>
+    invoke("delete_transactions", {
+      transactionsDate,
+      transactionIds,
     }),
 };
