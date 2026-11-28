@@ -20,7 +20,7 @@ const TransactionsTable = () => {
   const modalTransaction = useSignal<TransactionByTime | null>(null);
 
   return (
-    <>
+    <section>
       <DatePicker />
       {transactionsAtMonth.value.length === 0
         ? <h3>No transaction at this month and year.</h3>
@@ -192,7 +192,7 @@ const TransactionsTable = () => {
             />
           </>
         )}
-    </>
+    </section>
   );
 };
 

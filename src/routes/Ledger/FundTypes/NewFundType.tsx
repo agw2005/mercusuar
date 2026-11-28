@@ -3,7 +3,7 @@ import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
 const NewFundType = () => {
   return (
-    <>
+    <section>
       <h3>New Fund Type</h3>
       <GenericForm
         options={{
@@ -21,7 +21,7 @@ const NewFundType = () => {
           />
         </label>
       </GenericForm>
-    </>
+    </section>
   );
 };
 

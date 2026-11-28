@@ -3,7 +3,7 @@ import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
 const NewContact = () => {
   return (
-    <>
+    <section>
       <h3>New Contact</h3>
       <GenericForm
         options={{
@@ -21,7 +21,7 @@ const NewContact = () => {
           />
         </label>
       </GenericForm>
-    </>
+    </section>
   );
 };
 

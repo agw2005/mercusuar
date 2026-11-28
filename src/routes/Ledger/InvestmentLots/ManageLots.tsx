@@ -16,7 +16,7 @@ const ManageLots = () => {
   });
 
   return (
-    <>
+    <section>
       <h3>Manage Lots</h3>
       <form>
         {unarchivedInvestments.value.map((unarchivedAsset) => {
@@ -150,7 +150,7 @@ const ManageLots = () => {
           );
         })}
       </form>
-    </>
+    </section>
   );
 };
 

@@ -11,7 +11,7 @@ const ManageFundTypes = () => {
   const modalFundType = useSignal<FundTypes | null>(null);
 
   return (
-    <>
+    <section>
       <h3>Manage Fund Types</h3>
       <ul>
         {allFundTypes.value
@@ -115,7 +115,7 @@ const ManageFundTypes = () => {
           </button>
         </form>
       </dialog>
-    </>
+    </section>
   );
 };
 

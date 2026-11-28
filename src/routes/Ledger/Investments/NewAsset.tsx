@@ -4,7 +4,7 @@ import handleSubmit from "#view/Ledger/handleSubmit.ts";
 
 const NewAsset = () => {
   return (
-    <>
+    <section>
       <h3>New Asset</h3>
       <GenericForm
         options={{
@@ -63,7 +63,7 @@ const NewAsset = () => {
           />
         </label>
       </GenericForm>
-    </>
+    </section>
   );
 };
 

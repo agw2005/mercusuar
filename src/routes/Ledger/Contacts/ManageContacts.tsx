@@ -34,7 +34,7 @@ const ManageContacts = () => {
   );
 
   return (
-    <>
+    <section>
       <h3>Manage Contacts</h3>
       <form>
         {unarchivedContacts.value.map((contact) => {
@@ -211,7 +211,7 @@ const ManageContacts = () => {
           Cancel
         </button>
       </dialog>
-    </>
+    </section>
   );
 };
 

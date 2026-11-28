@@ -4,7 +4,7 @@ import { unarchivedInvestments } from "#/libs/store/investments.ts";
 
 const ManageAssets = () => {
   return (
-    <>
+    <section>
       <h3>Manage Assets</h3>
       <ul>
         {unarchivedInvestments.value.map((asset) => (
@@ -18,7 +18,7 @@ const ManageAssets = () => {
           </li>
         ))}
       </ul>
-    </>
+    </section>
   );
 };
 

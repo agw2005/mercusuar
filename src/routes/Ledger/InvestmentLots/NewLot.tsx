@@ -20,7 +20,7 @@ const NewLot = () => {
   });
 
   return (
-    <>
+    <section>
       <h3>New Lot</h3>
       <GenericForm
         options={{
@@ -155,7 +155,7 @@ const NewLot = () => {
           value={selectedDate.value}
         />
       </GenericForm>
-    </>
+    </section>
   );
 };
 

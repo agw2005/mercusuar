@@ -11,7 +11,7 @@ const ManageCategories = () => {
   const selectedCategory = useSignal<Categories | null>(null);
 
   return (
-    <>
+    <section>
       <h3>Manage Categories</h3>
       <ul>
         {allCategories.value
@@ -113,7 +113,7 @@ const ManageCategories = () => {
           </button>
         </form>
       </dialog>
-    </>
+    </section>
   );
 };
 

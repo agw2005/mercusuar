@@ -34,7 +34,7 @@ const ManageAccounts = () => {
   );
 
   return (
-    <>
+    <section>
       <h3>Manage Accounts</h3>
       <ul>
         {allAccounts.value
@@ -209,7 +209,7 @@ const ManageAccounts = () => {
           Cancel
         </button>
       </dialog>
-    </>
+    </section>
   );
 };
 

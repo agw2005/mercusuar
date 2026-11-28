@@ -15,7 +15,7 @@ import { isoToDateTimeInput } from "#/libs/isoToDateTimeInput.ts";
 
 const NewTransactions = () => {
   return (
-    <>
+    <section>
       <h3>New Transaction</h3>
       <GenericForm
         options={{
@@ -201,7 +201,7 @@ const NewTransactions = () => {
         />
         <p>{totalChange.value}</p>
       </GenericForm>
-    </>
+    </section>
   );
 };
 
